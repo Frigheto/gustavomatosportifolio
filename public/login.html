@@ -244,15 +244,21 @@
 
                 const data = await response.json();
 
+                console.log('Login Response Status:', response.status);
+                console.log('Login Response Data:', data);
+                console.log('ADMIN_PANEL URL:', window.APP_CONFIG.ADMIN_PANEL);
+
                 if (response.ok && data.success) {
                     successMsg.textContent = '✓ Login realizado! Redirecionando...';
                     successMsg.style.display = 'block';
+                    console.log('Login sucesso! Redirecionando para:', window.APP_CONFIG.ADMIN_PANEL);
                     setTimeout(() => {
                         window.location.href = window.APP_CONFIG.ADMIN_PANEL;
                     }, 1500);
                 } else {
                     errorMsg.textContent = '✗ Usuário ou senha inválidos';
                     errorMsg.style.display = 'block';
+                    console.log('Login falhou:', { status: response.status, data });
                     password.value = '';
                     btn.disabled = false;
                     btn.textContent = 'Entrar';

@@ -12,9 +12,13 @@ const app = express();
 // Em desenvolvimento: ../assets/data/content.json
 const CONTENT_PATH = path.join(process.cwd(), 'public', 'content.json');
 
-// Credenciais de admin (carregadas do .env)
+// Credenciais de admin (carregadas do .env ou variáveis de ambiente Vercel)
 const ADMIN_LOGIN = process.env.ADMIN_LOGIN || 'gustavo matos';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'gustavomatos2026';
+
+console.log('✅ Admin credentials loaded:');
+console.log('   Login:', ADMIN_LOGIN);
+console.log('   Password:', ADMIN_PASSWORD ? '***' : 'NOT SET');
 
 // =====================================================
 // CONFIGURAÇÃO DE CORS CORRETA (com Credentials)
