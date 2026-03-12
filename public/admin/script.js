@@ -7,26 +7,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let siteContent = {};
 
-    // ======== VERIFICAR AUTENTICAÇÃO ========
-    function checkAuth() {
-        const token = localStorage.getItem('auth_token');
-        console.log('🔐 checkAuth() chamado');
-        console.log('Token no localStorage:', token ? `Sim (${token.substring(0, 20)}...)` : 'NÃO ENCONTRADO');
-        console.log('LOGIN_PAGE:', LOGIN_PAGE);
-
-        if (!token) {
-            // Sem token, não autenticado
-            console.error('❌ REDIRECIONANDO PARA LOGIN - Nenhum token encontrado');
-            console.log('Redirecionando para:', LOGIN_PAGE);
-            window.location.href = LOGIN_PAGE;
-        } else {
-            console.log('✅ Token válido, permitindo acesso ao admin');
-        }
-    }
-
     // ======== GET TOKEN DO LOCALSTORAGE ========
+    // (checkAuth() já foi feito por auth-check.js ANTES de este script carregar)
     function getAuthToken() {
-        return localStorage.getItem('auth_token') || '';
+        const token = localStorage.getItem('auth_token');
+        console.log('🔑 getAuthToken():', token ? 'Token encontrado' : 'SEM TOKEN');
+        return token || '';
     }
 
     // ======== LOGOUT ========
@@ -326,7 +312,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ======== INICIALIZAR ========
+    // (auth-check.js já verificou autenticação antes deste script carregar)
+    console.log('🎉 Script.js inicializado - autenticação já foi verificada por auth-check.js');
     loadPhotosGallery();
-    checkAuth();
     loadContent();
 });
