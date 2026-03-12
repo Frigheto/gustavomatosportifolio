@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Gerenciar Mídia</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>GM Admin</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active"><a href="#fotos">Fotos do Site</a></li>
+                    <li><a href="#videos">Vídeos</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="logout-btn" class="btn-logout">Sair</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content">
+            <header class="content-header">
+                <h1>Gerenciar Conteúdo</h1>
+                <div class="user-info">
+                    <span>Administrador</span>
+                    <div class="avatar">👤</div>
+                </div>
+            </header>
+
+            <!-- Seção: Fotos do Site -->
+            <section id="fotos" class="section-card">
+                <h2>Fotos do Site</h2>
+                <p style="color: #999; font-size: 0.9rem; margin-bottom: 1.5rem;">Altere as imagens principais que aparecem no site</p>
+
+                <form id="images-form">
+                    <!-- Imagem Hero -->
+                    <div class="form-group">
+                        <label>Imagem do Topo (Hero)</label>
+                        <input type="text" id="hero-img-path" placeholder="Ex: assets/images/hero/foto.jpg ou https://link-da-imagem.jpg" required>
+                        <small>Use caminho local (assets/images/...) ou URL externa (Drive, Imgur, etc)</small>
+                    </div>
+
+                    <!-- Imagem Bio -->
+                    <div class="form-group">
+                        <label>Imagem da Apresentação (Bio)</label>
+                        <input type="text" id="bio-img-path" placeholder="Ex: assets/images/about/foto.jpg ou https://link-da-imagem.jpg" required>
+                        <small>Use caminho local ou URL externa</small>
+                    </div>
+
+                    <!-- Texto Hero -->
+                    <div class="form-group">
+                        <label>Texto de Fundo do Topo (Parallax)</label>
+                        <input type="text" id="hero-bg-text" placeholder="Ex: ATOR • DANÇARINO • PERFORMER" required>
+                        <small>Texto grande que aparece atrás do conteúdo no topo</small>
+                    </div>
+
+                    <!-- Galeria de Fotos do Artista -->
+                    <div class="form-group">
+                        <label>Ou Escolha uma Foto do Artista</label>
+                        <small style="display: block; margin-bottom: 1rem;">Clique em uma foto para usá-la como imagem do topo</small>
+                        <div id="photos-gallery" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 1rem; padding: 1rem; background: #0a0a0a; border-radius: 8px; max-height: 400px; overflow-y: auto;">
+                            <!-- Fotos serão carregadas aqui -->
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary">💾 Salvar Fotos</button>
+                </form>
+            </section>
+
+            <!-- Seção: Vídeos -->
+            <section id="videos" class="section-card" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <div>
+                        <h2>Vídeos do Site</h2>
+                        <p style="color: #999; font-size: 0.9rem; margin-top: 0.3rem;">Gerenciar vídeos que aparecem no site principal</p>
+                    </div>
+                    <button id="add-video-btn" class="btn-primary">+ Novo Vídeo</button>
+                </div>
+
+                <div id="videos-grid" class="videos-grid">
+                    <!-- Vídeos carregados dinamicamente -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal para Adicionar/Editar Vídeo -->
+    <div id="video-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Novo Vídeo</h2>
+                <button type="button" class="modal-close" id="close-modal-btn">&times;</button>
+            </div>
+
+            <form id="video-form">
+                <input type="hidden" id="v-index">
+
+                <div class="form-group">
+                    <label>Título</label>
+                    <input type="text" id="v-title" placeholder="Ex: Vídeo Promocional" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Categoria/Tag</label>
+                    <input type="text" id="v-tag" placeholder="Ex: PROMO / COMERCIAL" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Descrição</label>
+                    <textarea id="v-desc" placeholder="Descrição curta do vídeo" required style="width: 100%; padding: 0.8rem; background: #000; border: 1px solid #333; color: #fff; border-radius: 4px; font-family: inherit; resize: vertical;"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Imagem/Thumbnail</label>
+                    <input type="text" id="v-thumb" placeholder="Ex: assets/images/videos/thumb.jpg ou https://link-imagem.jpg" required>
+                    <small>Imagem que aparece antes de clicarem no vídeo</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Link do Vídeo</label>
+                    <input type="url" id="v-link" placeholder="Ex: https://www.youtube.com/embed/xxx ou https://drive.google.com/..." required>
+                    <small>Links do YouTube, Vimeo, Google Drive, etc</small>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Salvar Vídeo</button>
+                    <button type="button" class="btn-cancel" id="cancel-modal-btn">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Configuração centralizada de URLs (DEVE VIR PRIMEIRO) -->
+    <script src="../config.js"></script>
+    <!-- Scripts do admin -->
+    <script src="script.js"></script>
+</body>
+
+</html>
