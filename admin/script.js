@@ -265,7 +265,53 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // ======== GALERIA DE FOTOS DO ARTISTA ========
+    function loadPhotosGallery() {
+        const gallery = document.getElementById('photos-gallery');
+        const fotos = [
+            'IMG_9621.JPG.jpeg',
+            'IMG_9622.JPG.jpeg',
+            'IMG_9623.JPG.jpeg',
+            'IMG_9624.JPG.jpeg',
+            'IMG_9625.JPG.jpeg',
+            'IMG_9626.JPG.jpeg',
+            'IMG_9627.JPG.jpeg',
+            'IMG_9628.JPG.jpeg',
+            'IMG_9629.JPG.jpeg',
+            'IMG_9630.JPG.jpeg',
+            'IMG_9631.JPG.jpeg',
+            'IMG_9632.JPG.jpeg',
+            'IMG_9633.JPG.jpeg',
+            'IMG_9634.JPG.jpeg',
+            'IMG_9635.JPG.jpeg',
+            'IMG_9636.JPG.jpeg',
+            'IMG_9637.JPG.jpeg',
+            'IMG_9638.JPG.jpeg',
+            'IMG_9639.JPG.jpeg'
+        ];
+
+        fotos.forEach((foto) => {
+            const img = document.createElement('img');
+            const caminho = `assets/images/fotos-artista/${foto}`;
+            img.src = caminho;
+            img.alt = foto;
+            img.style.cursor = 'pointer';
+
+            img.addEventListener('click', () => {
+                // Remover seleção anterior
+                document.querySelectorAll('#photos-gallery img').forEach(i => i.classList.remove('selected'));
+                // Adicionar seleção
+                img.classList.add('selected');
+                // Preencher o input
+                document.getElementById('hero-img-path').value = caminho;
+            });
+
+            gallery.appendChild(img);
+        });
+    }
+
     // ======== INICIALIZAR ========
+    loadPhotosGallery();
     checkAuth();
     loadContent();
 });

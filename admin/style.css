@@ -508,6 +508,38 @@ body {
     background-color: rgba(255, 0, 0, 0.1) !important;
 }
 
+/* Gallery de Fotos */
+#photos-gallery {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)) !important;
+    gap: 1rem !important;
+    padding: 1rem !important;
+    background: #0a0a0a !important;
+    border-radius: 8px !important;
+    max-height: 400px !important;
+    overflow-y: auto !important;
+}
+
+#photos-gallery img {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+#photos-gallery img:hover {
+    border-color: var(--color-primary);
+    transform: scale(1.05);
+}
+
+#photos-gallery img.selected {
+    border-color: var(--color-primary) !important;
+    box-shadow: 0 0 15px rgba(255, 184, 3, 0.5);
+}
+
 @media (max-width: 1024px) {
     .sidebar {
         width: 80px;
