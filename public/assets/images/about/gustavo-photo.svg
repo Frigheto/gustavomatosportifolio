@@ -1,0 +1,33 @@
+<svg viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="photoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a5a5a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0a1a1a;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="300" height="400" fill="url(#photoGradient)"/>
+
+  <!-- Head -->
+  <circle cx="150" cy="100" r="40" fill="#8b7355"/>
+
+  <!-- Body -->
+  <path d="M 110 140 L 110 280 L 190 280 L 190 140 Q 150 120 110 140" fill="#3a3a3a"/>
+
+  <!-- Left arm -->
+  <path d="M 110 160 L 70 220" stroke="#8b7355" stroke-width="15" fill="none"/>
+
+  <!-- Right arm -->
+  <path d="M 190 160 L 230 200" stroke="#8b7355" stroke-width="15" fill="none"/>
+
+  <!-- Legs -->
+  <rect x="125" y="280" width="12" height="100" fill="#2a2a2a"/>
+  <rect x="163" y="280" width="12" height="100" fill="#2a2a2a"/>
+
+  <!-- Text -->
+  <text x="150" y="350" font-family="Arial, sans-serif" font-size="14" font-weight="bold"
+        text-anchor="middle" fill="#d4af37" opacity="0.6">
+    GUSTAVO MATOS
+  </text>
+</svg>
