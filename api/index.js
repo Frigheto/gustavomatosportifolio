@@ -7,7 +7,10 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 
 const app = express();
-const CONTENT_PATH = path.join(__dirname, '../assets/data/content.json');
+// Caminho para content.json
+// Em produção Vercel: /var/task/public/content.json
+// Em desenvolvimento: ../assets/data/content.json
+const CONTENT_PATH = path.join(process.cwd(), 'public', 'content.json');
 
 // Credenciais de admin (carregadas do .env)
 const ADMIN_LOGIN = process.env.ADMIN_LOGIN || 'gustavo matos';
