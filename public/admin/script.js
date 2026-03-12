@@ -311,7 +311,8 @@ document.addEventListener('DOMContentLoaded', () => {
         let photoCount = 0;
         fotos.forEach((foto) => {
             const img = document.createElement('img');
-            const caminho = `assets/images/fotos-artista/${foto}`;
+            // Usar caminho absoluto para funcionar em Vercel
+            const caminho = `/assets/images/fotos-artista/${foto}`;
             img.src = caminho;
             img.alt = foto;
             img.style.cursor = 'pointer';

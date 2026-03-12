@@ -6,21 +6,42 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 
 const app = express();
+
+// Detectar ambiente
+const isDevelopment = process.env.NODE_ENV !== 'production';
+
 // Caminho para content.json
-// Em produção Vercel: /var/task/public/content.json
-// Em desenvolvimento: ../assets/data/content.json
-const CONTENT_PATH = path.join(process.cwd(), 'public', 'content.json');
+// Em desenvolvimento: usar arquivo no public/
+// Em produção Vercel: usar /tmp (que funciona durante requisição)
+let CONTENT_PATH;
+if (isDevelopment) {
+    CONTENT_PATH = path.join(process.cwd(), 'public', 'content.json');
+} else {
+    CONTENT_PATH = '/tmp/content.json';
+}
 
 console.log('✅ API iniciada - Admin sem autenticação (público)');
+console.log('🌍 Ambiente:', isDevelopment ? 'DESENVOLVIMENTO' : 'PRODUÇÃO (VERCEL)');
 console.log('📂 process.cwd():', process.cwd());
 console.log('📁 CONTENT_PATH:', CONTENT_PATH);
 
 // Verificar se arquivo existe
-const fs = require('fs');
 if (fs.existsSync(CONTENT_PATH)) {
     console.log('✅ Arquivo content.json encontrado');
 } else {
-    console.warn('⚠️ Arquivo content.json NÃO encontrado em:', CONTENT_PATH);
+    console.warn('⚠️ Arquivo content.json NÃO encontrado, criando arquivo padrão...');
+
+    // Tentar copiar do public/
+    const sourceFile = path.join(process.cwd(), 'public', 'content.json');
+    if (fs.existsSync(sourceFile)) {
+        try {
+            const data = fs.readFileSync(sourceFile, 'utf8');
+            fs.writeFileSync(CONTENT_PATH, data, 'utf8');
+            console.log('✅ Arquivo copiado com sucesso');
+        } catch (err) {
+            console.error('❌ Erro ao copiar arquivo:', err.message);
+        }
+    }
 }
 
 // =====================================================
