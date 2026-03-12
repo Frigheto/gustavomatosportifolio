@@ -44,23 +44,22 @@ const CONFIG = {
 
   // ==================== PRODUÇÃO ====================
   production: {
-    // MUDE AQUI QUANDO FOR PARA PRODUÇÃO
-    // Exemplo: 'https://gustavomatos.com.br'
-    API_BASE: 'https://seu-dominio-aqui.com.br',
+    // URL de produção na Vercel
+    // https://portifoliogmatos.vercel.app/
+    API_BASE: 'https://portifoliogmatos.vercel.app',
 
-    API_CONTENT: 'https://seu-dominio-aqui.com.br/api/content',
-    API_LOGIN: 'https://seu-dominio-aqui.com.br/api/login',
-    API_LOGOUT: 'https://seu-dominio-aqui.com.br/api/logout',
-    API_AUTH_STATUS: 'https://seu-dominio-aqui.com.br/api/auth-status',
+    API_CONTENT: 'https://portifoliogmatos.vercel.app/api/content',
+    API_LOGIN: 'https://portifoliogmatos.vercel.app/api/login',
+    API_LOGOUT: 'https://portifoliogmatos.vercel.app/api/logout',
+    API_AUTH_STATUS: 'https://portifoliogmatos.vercel.app/api/auth-status',
 
-    FRONTEND_BASE: 'https://seu-dominio-aqui.com.br',
-    ADMIN_PANEL: 'https://seu-dominio-aqui.com.br/admin/',
-    LOGIN_PAGE: 'https://seu-dominio-aqui.com.br/login.html',
-    HOME_PAGE: 'https://seu-dominio-aqui.com.br/',
+    FRONTEND_BASE: 'https://portifoliogmatos.vercel.app',
+    ADMIN_PANEL: 'https://portifoliogmatos.vercel.app/admin/',
+    LOGIN_PAGE: 'https://portifoliogmatos.vercel.app/login.html',
+    HOME_PAGE: 'https://portifoliogmatos.vercel.app/',
 
     // CORS Origin (origem permitida no servidor)
-    // IMPORTANTE: Mude isso junto com os domínios acima!
-    CORS_ORIGIN: 'https://seu-dominio-aqui.com.br',
+    CORS_ORIGIN: 'https://portifoliogmatos.vercel.app',
   }
 };
 

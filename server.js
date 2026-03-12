@@ -23,7 +23,7 @@ const isDevelopment = process.env.NODE_ENV !== 'production';
 // Definir origens permitidas
 const allowedOrigins = isDevelopment
   ? ['http://localhost:5173', 'http://localhost:3001', 'http://127.0.0.1:5173']
-  : ['https://seu-dominio-aqui.com.br']; // Mudar para seu domínio em produção
+  : ['https://portifoliogmatos.vercel.app']; // Produção no Vercel
 
 app.use(cors({
     origin: (origin, callback) => {
