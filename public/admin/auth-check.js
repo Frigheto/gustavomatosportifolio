@@ -1,66 +1,58 @@
 /**
  * AUTH-CHECK.JS
  *
- * Verificação de autenticação que DEVE rodar ANTES de script.js
- * Valida o token tanto localmente quanto no servidor
+ * Verificação de autenticação SÍNCRONA que bloqueia script.js
+ * Deve rodar ANTES de script.js
  */
 
 console.log('🔐 AUTH-CHECK.JS INICIADO');
 
-// Esperar config.js ser carregado
-if (!window.APP_CONFIG) {
-    console.error('❌ APP_CONFIG não definido! Aguardando config.js...');
-    setTimeout(() => {
-        if (!window.APP_CONFIG) {
-            console.error('❌ TIMEOUT: APP_CONFIG ainda não disponível!');
+// 1. Verificar localStorage SINCRONAMENTE
+const token = localStorage.getItem('auth_token');
+console.log('📋 Token no localStorage:', token ? `Sim (${token.substring(0, 20)}...)` : 'NÃO ENCONTRADO');
+
+if (!token) {
+    console.error('❌ NENHUM TOKEN ENCONTRADO - Redirecionando para login');
+    // Redirecionar imediatamente se não houver token
+    window.location.href = '/login.html';
+    // Parar execução aqui
+    throw new Error('No auth token found');
+}
+
+// 2. Token existe, guardar em window para script.js usar
+window.AUTH_TOKEN = token;
+console.log('✅ Token armazenado em window.AUTH_TOKEN');
+
+// 3. Verificar no servidor em BACKGROUND (não bloqueia)
+console.log('🔍 Iniciando verificação no servidor (background)...');
+
+fetch('/api/auth-status', {
+    headers: {
+        'Authorization': `Bearer ${token}`
+    }
+})
+.then(response => {
+    console.log('📡 Resposta do servidor:', response.status);
+    return response.json();
+})
+.then(data => {
+    console.log('📦 Server response:', data);
+
+    if (data.authenticated) {
+        console.log('✅ AUTENTICAÇÃO VÁLIDA no servidor');
+    } else {
+        console.error('❌ Token inválido no servidor');
+        localStorage.removeItem('auth_token');
+        // Redirecionar para login
+        setTimeout(() => {
             window.location.href = '/login.html';
-        }
-    }, 1000);
-} else {
-    console.log('✅ APP_CONFIG carregado:', window.APP_CONFIG);
-}
-
-// Função para verificar autenticação
-async function verifyAuthentication() {
-    const token = localStorage.getItem('auth_token');
-    console.log('📋 Token no localStorage:', token ? `Sim (${token.substring(0, 20)}...)` : 'NÃO');
-
-    if (!token) {
-        console.warn('⚠️ Nenhum token encontrado no localStorage');
-        console.log('Redirecionando para:', window.APP_CONFIG?.LOGIN_PAGE || '/login.html');
-        window.location.href = window.APP_CONFIG?.LOGIN_PAGE || '/login.html';
-        return false;
+        }, 100);
     }
+})
+.catch(err => {
+    console.error('❌ Erro ao verificar no servidor:', err);
+    // Mesmo com erro, permite continuar se tiver token local
+    console.warn('⚠️ Continuando com token local apesar de erro no servidor');
+});
 
-    // Verificar token no servidor
-    try {
-        console.log('🔍 Verificando token no servidor...');
-        const response = await fetch(window.APP_CONFIG?.API_AUTH_STATUS || '/api/auth-status', {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-
-        console.log('📡 Resposta do servidor:', response.status);
-        const data = await response.json();
-        console.log('📦 Data:', data);
-
-        if (data.authenticated) {
-            console.log('✅ AUTENTICAÇÃO VÁLIDA - Token verificado no servidor');
-            return true;
-        } else {
-            console.warn('❌ Token inválido no servidor');
-            localStorage.removeItem('auth_token');
-            window.location.href = window.APP_CONFIG?.LOGIN_PAGE || '/login.html';
-            return false;
-        }
-    } catch (err) {
-        console.error('❌ Erro ao verificar autenticação no servidor:', err);
-        window.location.href = window.APP_CONFIG?.LOGIN_PAGE || '/login.html';
-        return false;
-    }
-}
-
-// Executar verificação imediatamente
-console.log('🚀 Iniciando verificação de autenticação...');
-verifyAuthentication();
+console.log('✅ AUTH-CHECK.JS COMPLETADO - Permitindo script.js executar');

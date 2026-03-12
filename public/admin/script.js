@@ -7,12 +7,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let siteContent = {};
 
-    // ======== GET TOKEN DO LOCALSTORAGE ========
-    // (checkAuth() já foi feito por auth-check.js ANTES de este script carregar)
+    // ======== GET TOKEN ========
+    // (auth-check.js já garantiu que temos um token válido)
     function getAuthToken() {
-        const token = localStorage.getItem('auth_token');
-        console.log('🔑 getAuthToken():', token ? 'Token encontrado' : 'SEM TOKEN');
-        return token || '';
+        // Usar token de window.AUTH_TOKEN (definido por auth-check.js)
+        const token = window.AUTH_TOKEN || localStorage.getItem('auth_token');
+        if (!token) {
+            console.error('❌ NENHUM TOKEN DISPONÍVEL!');
+            window.location.href = LOGIN_PAGE;
+        }
+        return token;
     }
 
     // ======== LOGOUT ========
@@ -313,7 +317,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ======== INICIALIZAR ========
     // (auth-check.js já verificou autenticação antes deste script carregar)
-    console.log('🎉 Script.js inicializado - autenticação já foi verificada por auth-check.js');
+    console.log('🎉 Script.js inicializado');
+    console.log('✅ Token disponível:', window.AUTH_TOKEN ? `Sim (${window.AUTH_TOKEN.substring(0, 20)}...)` : 'Em localStorage');
     loadPhotosGallery();
     loadContent();
 });
