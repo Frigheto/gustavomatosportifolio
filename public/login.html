@@ -256,8 +256,10 @@
                         window.location.href = window.APP_CONFIG.ADMIN_PANEL;
                     }, 1500);
                 } else {
-                    errorMsg.textContent = '✗ Usuário ou senha inválidos';
+                    const errorDetail = `✗ Erro: ${data.error || 'Usuário ou senha inválidos'}`;
+                    errorMsg.textContent = errorDetail;
                     errorMsg.style.display = 'block';
+                    alert('ERRO DE LOGIN:\n\n' + errorDetail + '\n\nStatus: ' + response.status + '\n\nResposta: ' + JSON.stringify(data));
                     console.log('Login falhou:', { status: response.status, data });
                     password.value = '';
                     btn.disabled = false;
@@ -265,11 +267,25 @@
                 }
             } catch (err) {
                 console.error('Error:', err);
-                errorMsg.textContent = '✗ Erro ao conectar com o servidor';
+                const errorDetail = `✗ Erro ao conectar com o servidor: ${err.message}`;
+                errorMsg.textContent = errorDetail;
                 errorMsg.style.display = 'block';
+                alert('ERRO DE CONEXÃO:\n\n' + errorDetail + '\n\nAPI: ' + window.APP_CONFIG.API_LOGIN);
                 btn.disabled = false;
                 btn.textContent = 'Entrar';
             }
+        });
+
+        // Debug: Mostrar config ao carregar
+        console.log('=== CONFIG CARREGADA ===');
+        console.log('API_LOGIN:', window.APP_CONFIG?.API_LOGIN);
+        console.log('ADMIN_PANEL:', window.APP_CONFIG?.ADMIN_PANEL);
+        console.log('isDevelopment:', window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+        // Adicionar evento para logar cliques
+        document.getElementById('login-btn').addEventListener('click', () => {
+            console.log('Botão clicado! Config:', window.APP_CONFIG);
+        });
         });
     </script>
 </body>
