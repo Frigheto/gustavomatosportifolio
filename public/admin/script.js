@@ -244,7 +244,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ======== GALERIA DE FOTOS DO ARTISTA ========
     function loadPhotosGallery() {
+        console.log('🖼️ loadPhotosGallery() iniciado');
         const gallery = document.getElementById('photos-gallery');
+        console.log('📸 Gallery element encontrado:', gallery ? 'SIM' : 'NÃO');
+
         const fotos = [
             'IMG_9621.JPG.jpeg',
             'IMG_9622.JPG.jpeg',
@@ -267,24 +270,38 @@ document.addEventListener('DOMContentLoaded', () => {
             'IMG_9639.JPG.jpeg'
         ];
 
+        let photoCount = 0;
         fotos.forEach((foto) => {
             const img = document.createElement('img');
             const caminho = `assets/images/fotos-artista/${foto}`;
             img.src = caminho;
             img.alt = foto;
             img.style.cursor = 'pointer';
+            photoCount++;
+
+            console.log(`  ${photoCount}. Carregando: ${foto}`);
 
             img.addEventListener('click', () => {
+                console.log('🖼️ Foto clicada:', foto);
                 // Remover seleção anterior
                 document.querySelectorAll('#photos-gallery img').forEach(i => i.classList.remove('selected'));
                 // Adicionar seleção
                 img.classList.add('selected');
                 // Preencher o input
-                document.getElementById('hero-img-path').value = caminho;
+                const inputField = document.getElementById('hero-img-path');
+                console.log('📝 Preenchendo input com:', caminho);
+                console.log('📝 Input encontrado:', inputField ? 'SIM' : 'NÃO');
+                if (inputField) {
+                    inputField.value = caminho;
+                    console.log('✅ Input preenchido com sucesso');
+                } else {
+                    console.error('❌ Input #hero-img-path não encontrado!');
+                }
             });
 
             gallery.appendChild(img);
         });
+        console.log(`✅ Galeria carregada com ${photoCount} fotos`);
     }
 
     // ======== INICIALIZAR ========
