@@ -157,25 +157,6 @@
         .back-link a:hover {
             color: #ffcc33;
         }
-
-        .spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 3px solid rgba(255, 184, 3, 0.3);
-            border-radius: 50%;
-            border-top-color: var(--color-bg-dark);
-            animation: spin 0.8s linear infinite;
-            margin-right: 0.5rem;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .btn-loading {
-            display: none;
-        }
     </style>
 </head>
 <body>
@@ -244,47 +225,26 @@
 
                 const data = await response.json();
 
-                console.log('Login Response Status:', response.status);
-                console.log('Login Response Data:', data);
-                console.log('ADMIN_PANEL URL:', window.APP_CONFIG.ADMIN_PANEL);
-
                 if (response.ok && data.success) {
                     successMsg.textContent = '✓ Login realizado! Redirecionando...';
                     successMsg.style.display = 'block';
-                    console.log('Login sucesso! Redirecionando para:', window.APP_CONFIG.ADMIN_PANEL);
                     setTimeout(() => {
                         window.location.href = window.APP_CONFIG.ADMIN_PANEL;
                     }, 1500);
                 } else {
-                    const errorDetail = `✗ Erro: ${data.error || 'Usuário ou senha inválidos'}`;
-                    errorMsg.textContent = errorDetail;
+                    errorMsg.textContent = '✗ Usuário ou senha inválidos';
                     errorMsg.style.display = 'block';
-                    alert('ERRO DE LOGIN:\n\n' + errorDetail + '\n\nStatus: ' + response.status + '\n\nResposta: ' + JSON.stringify(data));
-                    console.log('Login falhou:', { status: response.status, data });
                     password.value = '';
                     btn.disabled = false;
                     btn.textContent = 'Entrar';
                 }
             } catch (err) {
                 console.error('Error:', err);
-                const errorDetail = `✗ Erro ao conectar com o servidor: ${err.message}`;
-                errorMsg.textContent = errorDetail;
+                errorMsg.textContent = '✗ Erro ao conectar com o servidor';
                 errorMsg.style.display = 'block';
-                alert('ERRO DE CONEXÃO:\n\n' + errorDetail + '\n\nAPI: ' + window.APP_CONFIG.API_LOGIN);
                 btn.disabled = false;
                 btn.textContent = 'Entrar';
             }
-        });
-
-        // Debug: Mostrar config ao carregar
-        console.log('=== CONFIG CARREGADA ===');
-        console.log('API_LOGIN:', window.APP_CONFIG?.API_LOGIN);
-        console.log('ADMIN_PANEL:', window.APP_CONFIG?.ADMIN_PANEL);
-        console.log('isDevelopment:', window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-
-        // Adicionar evento para logar cliques
-        document.getElementById('login-btn').addEventListener('click', () => {
-            console.log('Botão clicado! Config:', window.APP_CONFIG);
         });
     </script>
 </body>
