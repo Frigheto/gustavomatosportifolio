@@ -66,8 +66,21 @@
 
                     <!-- Galeria de Fotos do Artista -->
                     <div class="form-group">
-                        <label>Ou Escolha uma Foto do Artista</label>
-                        <small style="display: block; margin-bottom: 1rem;">Clique em uma foto para usá-la como imagem do topo</small>
+                        <label>Galeria de Fotos do Artista</label>
+                        <small style="display: block; margin-bottom: 0.5rem;">
+                            Selecione o campo que deseja preencher:
+                        </small>
+                        <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: normal;">
+                                <input type="radio" name="photo-target" value="hero" checked style="cursor: pointer;">
+                                Imagem do Topo (Hero)
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: normal;">
+                                <input type="radio" name="photo-target" value="bio" style="cursor: pointer;">
+                                Imagem da Apresentação (Bio)
+                            </label>
+                        </div>
+                        <small style="display: block; margin-bottom: 1rem; color: #ffb803;">Escolha qual campo deseja preencher, depois clique em uma foto</small>
                         <div id="photos-gallery" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 1rem; padding: 1rem; background: #0a0a0a; border-radius: 8px; max-height: 400px; overflow-y: auto;">
                             <!-- Fotos serão carregadas aqui -->
                         </div>

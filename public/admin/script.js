@@ -332,6 +332,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const gallery = document.getElementById('photos-gallery');
         console.log('📸 Gallery element encontrado:', gallery ? 'SIM' : 'NÃO');
 
+        // Adicionar listeners aos radio buttons
+        const radioButtons = document.querySelectorAll('input[name="photo-target"]');
+        radioButtons.forEach(radio => {
+            radio.addEventListener('change', () => {
+                const target = radio.value;
+                const fieldLabel = target === 'bio' ? 'Imagem da Apresentação (Bio)' : 'Imagem do Topo (Hero)';
+                console.log('🎯 Campo alvo mudado para:', fieldLabel);
+            });
+        });
+
         const fotos = [
             'IMG_9621.JPG.jpeg',
             'IMG_9622.JPG.jpeg',
@@ -368,38 +378,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
             img.addEventListener('click', (event) => {
                 console.log('🖼️ Foto clicada:', foto);
-                console.log('Event:', event);
-                console.log('Event target:', event.target);
-                console.log('Event currentTarget:', event.currentTarget);
+
+                // Verificar qual campo foi selecionado (Hero ou Bio)
+                const selectedTarget = document.querySelector('input[name="photo-target"]:checked');
+                const target = selectedTarget ? selectedTarget.value : 'hero';
+                console.log('🎯 Alvo selecionado:', target);
 
                 // Remover seleção anterior
                 const allPhotos = document.querySelectorAll('#photos-gallery img');
-                console.log('📸 Total de fotos encontradas:', allPhotos.length);
                 allPhotos.forEach(i => i.classList.remove('selected'));
 
                 // Adicionar seleção
                 img.classList.add('selected');
-                console.log('✨ Classe "selected" adicionada');
+                console.log('✨ Foto marcada como selecionada');
 
-                // Preencher o input
-                const inputField = document.getElementById('hero-img-path');
-                console.log('📝 Preenchendo input com:', caminho);
-                console.log('📝 Input encontrado:', inputField ? 'SIM' : 'NÃO');
+                // Preencher o input correto baseado na seleção
+                const inputId = target === 'bio' ? 'bio-img-path' : 'hero-img-path';
+                const inputField = document.getElementById(inputId);
+                console.log('📝 Preenchendo campo:', inputId);
+                console.log('📝 Caminho:', caminho);
 
                 if (inputField) {
                     inputField.value = caminho;
-                    console.log('✅ Input preenchido:', inputField.value);
+                    console.log('✅ Campo preenchido com sucesso');
 
-                    // Forçar evento de mudança
-                    const event = new Event('change', { bubbles: true });
-                    inputField.dispatchEvent(event);
-                    console.log('✅ Evento "change" disparado');
+                    // Mostrar feedback visual
+                    const fieldLabel = target === 'bio' ? 'Imagem da Apresentação (Bio)' : 'Imagem do Topo (Hero)';
+                    alert(`✅ ${fieldLabel} atualizado com: ${foto}`);
                 } else {
-                    console.error('❌ Input #hero-img-path não encontrado!');
-                    console.error('IDs de inputs no documento:');
-                    document.querySelectorAll('input').forEach(inp => {
-                        console.error('  -', inp.id, ':', inp.value);
-                    });
+                    console.error('❌ Campo não encontrado:', inputId);
                 }
             });
 
