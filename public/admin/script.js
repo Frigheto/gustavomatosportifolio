@@ -121,6 +121,10 @@ document.addEventListener('DOMContentLoaded', () => {
         siteContent.hero.bgText = document.getElementById('hero-bg-text').value;
 
         try {
+            console.log('💾 Salvando fotos...');
+            console.log('API_URL:', API_URL);
+            console.log('Dados a enviar:', siteContent);
+
             const resp = await fetch(API_URL, {
                 method: 'POST',
                 headers: {
@@ -128,12 +132,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 body: JSON.stringify(siteContent)
             });
+
+            console.log('📡 Resposta recebida, status:', resp.status);
+            const responseText = await resp.text();
+            console.log('📦 Resposta body:', responseText);
+
             if (resp.ok) {
                 alert('✓ Fotos salvas com sucesso!');
+            } else {
+                alert('✗ Erro ao salvar: ' + resp.status);
+                console.error('Erro na resposta:', responseText);
             }
         } catch (err) {
             alert('✗ Erro ao salvar fotos');
-            console.error(err);
+            console.error('❌ Erro:', err);
         }
     });
 
@@ -155,20 +167,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.deleteVideo = async (index) => {
         if (confirm('Tem certeza que deseja deletar este vídeo?')) {
+            const deletedVideo = siteContent.videos[index];
+            console.log('🗑️ Deletando vídeo:', deletedVideo.title);
             siteContent.videos.splice(index, 1);
             try {
-                await fetch(API_URL, {
+                console.log('💾 Salvando após deletar...');
+                const resp = await fetch(API_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(siteContent)
                 });
-                renderVideos();
-                alert('✓ Vídeo deletado com sucesso!');
+
+                console.log('📡 Resposta recebida, status:', resp.status);
+                const responseText = await resp.text();
+                console.log('📦 Resposta body:', responseText);
+
+                if (resp.ok) {
+                    renderVideos();
+                    alert('✓ Vídeo deletado com sucesso!');
+                } else {
+                    alert('✗ Erro ao deletar vídeo: ' + resp.status);
+                    console.error('Erro na resposta:', responseText);
+                }
             } catch (err) {
                 alert('✗ Erro ao deletar vídeo');
-                console.error(err);
+                console.error('❌ Erro:', err);
             }
         }
     };
@@ -226,19 +251,32 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            await fetch(API_URL, {
+            console.log('💾 Salvando vídeo...');
+            console.log('Vídeos a salvar:', siteContent.videos);
+
+            const resp = await fetch(API_URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(siteContent)
             });
-            modal.style.display = 'none';
-            renderVideos();
-            alert('✓ Vídeo salvo com sucesso!');
+
+            console.log('📡 Resposta recebida, status:', resp.status);
+            const responseText = await resp.text();
+            console.log('📦 Resposta body:', responseText);
+
+            if (resp.ok) {
+                modal.style.display = 'none';
+                renderVideos();
+                alert('✓ Vídeo salvo com sucesso!');
+            } else {
+                alert('✗ Erro ao salvar vídeo: ' + resp.status);
+                console.error('Erro na resposta:', responseText);
+            }
         } catch (err) {
             alert('✗ Erro ao salvar vídeo');
-            console.error(err);
+            console.error('❌ Erro:', err);
         }
     });
 

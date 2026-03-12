@@ -12,6 +12,16 @@ const app = express();
 const CONTENT_PATH = path.join(process.cwd(), 'public', 'content.json');
 
 console.log('✅ API iniciada - Admin sem autenticação (público)');
+console.log('📂 process.cwd():', process.cwd());
+console.log('📁 CONTENT_PATH:', CONTENT_PATH);
+
+// Verificar se arquivo existe
+const fs = require('fs');
+if (fs.existsSync(CONTENT_PATH)) {
+    console.log('✅ Arquivo content.json encontrado');
+} else {
+    console.warn('⚠️ Arquivo content.json NÃO encontrado em:', CONTENT_PATH);
+}
 
 // =====================================================
 // TOKEN REMOVIDO - Admin agora é público
@@ -49,8 +59,13 @@ app.use(bodyParser.json({ limit: '50mb' }));
 
 // Get current content (PÚBLICO - para que o site principal possa carregar)
 app.get('/api/content', (req, res) => {
+    console.log('📖 GET /api/content - lendo de:', CONTENT_PATH);
     fs.readFile(CONTENT_PATH, 'utf8', (err, data) => {
-        if (err) return res.status(500).send('Error reading data');
+        if (err) {
+            console.error('❌ Erro ao ler:', err.message);
+            return res.status(500).send('Error reading data');
+        }
+        console.log('✅ Conteúdo lido com sucesso');
         res.json(JSON.parse(data));
     });
 });
@@ -58,8 +73,15 @@ app.get('/api/content', (req, res) => {
 // Update content (PUBLIC - admin é acessível diretamente)
 app.post('/api/content', (req, res) => {
     const newContent = req.body;
+    console.log('💾 Tentando salvar em:', CONTENT_PATH);
     fs.writeFile(CONTENT_PATH, JSON.stringify(newContent, null, 2), 'utf8', (err) => {
-        if (err) return res.status(500).send('Error saving data');
+        if (err) {
+            console.error('❌ Erro ao salvar:', err.message);
+            console.error('   Código:', err.code);
+            console.error('   Path:', CONTENT_PATH);
+            return res.status(500).json({ error: 'Error saving data', details: err.message });
+        }
+        console.log('✅ Arquivo salvo com sucesso');
         res.json({ success: true, message: 'Content updated successfully' });
     });
 });
