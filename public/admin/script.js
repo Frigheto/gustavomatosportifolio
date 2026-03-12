@@ -10,9 +10,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // ======== VERIFICAR AUTENTICAÇÃO ========
     function checkAuth() {
         const token = localStorage.getItem('auth_token');
+        console.log('🔐 checkAuth() chamado');
+        console.log('Token no localStorage:', token ? `Sim (${token.substring(0, 20)}...)` : 'NÃO ENCONTRADO');
+        console.log('LOGIN_PAGE:', LOGIN_PAGE);
+
         if (!token) {
             // Sem token, não autenticado
+            console.error('❌ REDIRECIONANDO PARA LOGIN - Nenhum token encontrado');
+            console.log('Redirecionando para:', LOGIN_PAGE);
             window.location.href = LOGIN_PAGE;
+        } else {
+            console.log('✅ Token válido, permitindo acesso ao admin');
         }
     }
 
@@ -52,13 +60,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // ======== CARREGAR CONTEÚDO ========
     async function loadContent() {
         try {
+            const token = getAuthToken();
+            console.log('📂 loadContent() iniciado');
+            console.log('API_URL:', API_URL);
+            console.log('Token sendo enviado:', token ? `Sim (${token.substring(0, 20)}...)` : 'NÃO');
+
             const resp = await fetch(API_URL, {
                 headers: {
-                    'Authorization': `Bearer ${getAuthToken()}`
+                    'Authorization': `Bearer ${token}`
                 }
             });
-            if (!resp.ok) throw new Error('Erro ao carregar conteúdo');
+            console.log('📡 Resposta do servidor:', resp.status);
+
+            if (!resp.ok) throw new Error(`Erro ao carregar conteúdo: ${resp.status}`);
             siteContent = await resp.json();
+            console.log('✅ Conteúdo carregado com sucesso');
 
             // Garantir que a estrutura existe (inicializar se vazio)
             if (!siteContent.hero) {
