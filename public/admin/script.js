@@ -37,11 +37,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const resp = await fetch(API_URL);
             console.log('📡 Resposta do servidor:', resp.status);
 
-            if (!resp.ok) throw new Error(`Erro ao carregar conteúdo: ${resp.status}`);
-            siteContent = await resp.json();
-            console.log('✅ Conteúdo carregado com sucesso');
+            if (resp.ok) {
+                siteContent = await resp.json();
+                console.log('✅ Conteúdo carregado da API');
+                // Salvar no localStorage como backup
+                localStorage.setItem('siteContent', JSON.stringify(siteContent));
+            } else {
+                throw new Error(`API retornou ${resp.status}`);
+            }
 
-            // Garantir que a estrutura existe (inicializar se vazio)
+            // Garantir que a estrutura existe
             if (!siteContent.hero) {
                 siteContent.hero = { image: '', bgText: 'GUSTAVO MATOS GUSTAVO MATOS GUSTAVO MATOS' };
             }
@@ -55,8 +60,29 @@ document.addEventListener('DOMContentLoaded', () => {
             populateForms();
             renderVideos();
         } catch (err) {
-            console.error('Error loading content:', err);
-            alert('Erro ao carregar dados. Verifique se está autenticado.');
+            console.warn('⚠️ Erro ao carregar da API:', err.message);
+
+            // Tentar carregar do localStorage como backup
+            const backup = localStorage.getItem('siteContent');
+            if (backup) {
+                console.log('📦 Carregando dados do localStorage (backup)');
+                siteContent = JSON.parse(backup);
+                populateForms();
+                renderVideos();
+                alert('⚠️ Usando dados em cache (offline mode)');
+            } else {
+                console.error('❌ Erro ao carregar dados');
+                // Criar estrutura padrão
+                siteContent = {
+                    hero: { image: '', bgText: 'GUSTAVO MATOS' },
+                    presentation: { image: '', bio1: '', bio2: '', cards: [] },
+                    videos: []
+                };
+                localStorage.setItem('siteContent', JSON.stringify(siteContent));
+                populateForms();
+                renderVideos();
+                alert('Usando estrutura padrão. Os dados serão salvos localmente.');
+            }
         }
     }
 
@@ -122,26 +148,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             console.log('💾 Salvando fotos...');
-            console.log('API_URL:', API_URL);
-            console.log('Dados a enviar:', siteContent);
+            console.log('Dados a salvar:', siteContent);
 
-            const resp = await fetch(API_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(siteContent)
-            });
+            // Salvar no localStorage primeiro (sempre funciona)
+            localStorage.setItem('siteContent', JSON.stringify(siteContent));
+            console.log('✅ Dados salvos no localStorage');
 
-            console.log('📡 Resposta recebida, status:', resp.status);
-            const responseText = await resp.text();
-            console.log('📦 Resposta body:', responseText);
-
-            if (resp.ok) {
-                alert('✓ Fotos salvas com sucesso!');
-            } else {
-                alert('✗ Erro ao salvar: ' + resp.status);
-                console.error('Erro na resposta:', responseText);
+            // Tentar salvar na API (em background)
+            try {
+                const resp = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(siteContent)
+                });
+                if (resp.ok) {
+                    console.log('✅ Dados também salvos na API');
+                    alert('✓ Fotos salvas com sucesso!');
+                } else {
+                    console.warn('⚠️ API falhou, mas dados estão salvos localmente');
+                    alert('✓ Fotos salvas localmente (API indisponível)');
+                }
+            } catch (apiErr) {
+                console.warn('⚠️ Erro na API, mas dados estão salvos localmente:', apiErr);
+                alert('✓ Fotos salvas localmente (usando cache)');
             }
         } catch (err) {
             alert('✗ Erro ao salvar fotos');
@@ -172,24 +201,32 @@ document.addEventListener('DOMContentLoaded', () => {
             siteContent.videos.splice(index, 1);
             try {
                 console.log('💾 Salvando após deletar...');
-                const resp = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(siteContent)
-                });
 
-                console.log('📡 Resposta recebida, status:', resp.status);
-                const responseText = await resp.text();
-                console.log('📦 Resposta body:', responseText);
+                // Salvar no localStorage primeiro (sempre funciona)
+                localStorage.setItem('siteContent', JSON.stringify(siteContent));
+                console.log('✅ Dados salvos no localStorage');
 
-                if (resp.ok) {
+                // Tentar salvar na API (em background)
+                try {
+                    const resp = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(siteContent)
+                    });
+
+                    if (resp.ok) {
+                        console.log('✅ Dados também salvos na API');
+                        renderVideos();
+                        alert('✓ Vídeo deletado com sucesso!');
+                    } else {
+                        console.warn('⚠️ API falhou, mas dados estão salvos localmente');
+                        renderVideos();
+                        alert('✓ Vídeo deletado localmente (API indisponível)');
+                    }
+                } catch (apiErr) {
+                    console.warn('⚠️ Erro na API, mas dados estão salvos localmente:', apiErr);
                     renderVideos();
-                    alert('✓ Vídeo deletado com sucesso!');
-                } else {
-                    alert('✗ Erro ao deletar vídeo: ' + resp.status);
-                    console.error('Erro na resposta:', responseText);
+                    alert('✓ Vídeo deletado localmente (usando cache)');
                 }
             } catch (err) {
                 alert('✗ Erro ao deletar vídeo');
@@ -254,25 +291,34 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('💾 Salvando vídeo...');
             console.log('Vídeos a salvar:', siteContent.videos);
 
-            const resp = await fetch(API_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(siteContent)
-            });
+            // Salvar no localStorage primeiro (sempre funciona)
+            localStorage.setItem('siteContent', JSON.stringify(siteContent));
+            console.log('✅ Dados salvos no localStorage');
 
-            console.log('📡 Resposta recebida, status:', resp.status);
-            const responseText = await resp.text();
-            console.log('📦 Resposta body:', responseText);
+            // Tentar salvar na API (em background)
+            try {
+                const resp = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(siteContent)
+                });
 
-            if (resp.ok) {
+                if (resp.ok) {
+                    console.log('✅ Dados também salvos na API');
+                    modal.style.display = 'none';
+                    renderVideos();
+                    alert('✓ Vídeo salvo com sucesso!');
+                } else {
+                    console.warn('⚠️ API falhou, mas dados estão salvos localmente');
+                    modal.style.display = 'none';
+                    renderVideos();
+                    alert('✓ Vídeo salvo localmente (API indisponível)');
+                }
+            } catch (apiErr) {
+                console.warn('⚠️ Erro na API, mas dados estão salvos localmente:', apiErr);
                 modal.style.display = 'none';
                 renderVideos();
-                alert('✓ Vídeo salvo com sucesso!');
-            } else {
-                alert('✗ Erro ao salvar vídeo: ' + resp.status);
-                console.error('Erro na resposta:', responseText);
+                alert('✓ Vídeo salvo localmente (usando cache)');
             }
         } catch (err) {
             alert('✗ Erro ao salvar vídeo');
@@ -320,21 +366,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
             console.log(`  ${photoCount}. Carregando: ${foto}`);
 
-            img.addEventListener('click', () => {
+            img.addEventListener('click', (event) => {
                 console.log('🖼️ Foto clicada:', foto);
+                console.log('Event:', event);
+                console.log('Event target:', event.target);
+                console.log('Event currentTarget:', event.currentTarget);
+
                 // Remover seleção anterior
-                document.querySelectorAll('#photos-gallery img').forEach(i => i.classList.remove('selected'));
+                const allPhotos = document.querySelectorAll('#photos-gallery img');
+                console.log('📸 Total de fotos encontradas:', allPhotos.length);
+                allPhotos.forEach(i => i.classList.remove('selected'));
+
                 // Adicionar seleção
                 img.classList.add('selected');
+                console.log('✨ Classe "selected" adicionada');
+
                 // Preencher o input
                 const inputField = document.getElementById('hero-img-path');
                 console.log('📝 Preenchendo input com:', caminho);
                 console.log('📝 Input encontrado:', inputField ? 'SIM' : 'NÃO');
+
                 if (inputField) {
                     inputField.value = caminho;
-                    console.log('✅ Input preenchido com sucesso');
+                    console.log('✅ Input preenchido:', inputField.value);
+
+                    // Forçar evento de mudança
+                    const event = new Event('change', { bubbles: true });
+                    inputField.dispatchEvent(event);
+                    console.log('✅ Evento "change" disparado');
                 } else {
                     console.error('❌ Input #hero-img-path não encontrado!');
+                    console.error('IDs de inputs no documento:');
+                    document.querySelectorAll('input').forEach(inp => {
+                        console.error('  -', inp.id, ':', inp.value);
+                    });
                 }
             });
 
