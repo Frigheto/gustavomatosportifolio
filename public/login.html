@@ -226,6 +226,9 @@
                 const data = await response.json();
 
                 if (response.ok && data.success) {
+                    // Salvar token no localStorage
+                    localStorage.setItem('auth_token', data.token);
+
                     successMsg.textContent = '✓ Login realizado! Redirecionando...';
                     successMsg.style.display = 'block';
                     setTimeout(() => {

@@ -8,34 +8,25 @@ document.addEventListener('DOMContentLoaded', () => {
     let siteContent = {};
 
     // ======== VERIFICAR AUTENTICAÇÃO ========
-    async function checkAuth() {
-        try {
-            const resp = await fetch(AUTH_URL, {
-                credentials: 'include'
-            });
-            const data = await resp.json();
-            if (!data.authenticated) {
-                window.location.href = LOGIN_PAGE;
-            }
-        } catch (err) {
-            console.error('Auth check error:', err);
+    function checkAuth() {
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+            // Sem token, não autenticado
             window.location.href = LOGIN_PAGE;
         }
+    }
+
+    // ======== GET TOKEN DO LOCALSTORAGE ========
+    function getAuthToken() {
+        return localStorage.getItem('auth_token') || '';
     }
 
     // ======== LOGOUT ========
     document.getElementById('logout-btn').addEventListener('click', async () => {
         if (confirm('Tem certeza que deseja sair?')) {
-            try {
-                await fetch(LOGOUT_URL, {
-                    method: 'POST',
-                    credentials: 'include'
-                });
-                window.location.href = LOGIN_PAGE;
-            } catch (err) {
-                console.error('Logout error:', err);
-                window.location.href = LOGIN_PAGE;
-            }
+            // Remover token do localStorage
+            localStorage.removeItem('auth_token');
+            window.location.href = LOGIN_PAGE;
         }
     });
 
@@ -62,7 +53,9 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadContent() {
         try {
             const resp = await fetch(API_URL, {
-                credentials: 'include'
+                headers: {
+                    'Authorization': `Bearer ${getAuthToken()}`
+                }
             });
             if (!resp.ok) throw new Error('Erro ao carregar conteúdo');
             siteContent = await resp.json();
@@ -149,8 +142,10 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const resp = await fetch(API_URL, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${getAuthToken()}`
+                },
                 body: JSON.stringify(siteContent)
             });
             if (resp.ok) {
@@ -184,8 +179,10 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 await fetch(API_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${getAuthToken()}`
+                    },
                     body: JSON.stringify(siteContent)
                 });
                 renderVideos();
@@ -252,8 +249,10 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             await fetch(API_URL, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${getAuthToken()}`
+                },
                 body: JSON.stringify(siteContent)
             });
             modal.style.display = 'none';

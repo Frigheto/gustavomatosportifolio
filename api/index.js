@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const session = require('express-session');
+const crypto = require('crypto');
 
 const app = express();
 // Caminho para content.json
@@ -15,13 +15,45 @@ const CONTENT_PATH = path.join(process.cwd(), 'public', 'content.json');
 // Credenciais de admin (carregadas do .env ou variáveis de ambiente Vercel)
 const ADMIN_LOGIN = process.env.ADMIN_LOGIN || 'gustavo matos';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'gustavomatos2026';
+const TOKEN_SECRET = process.env.SESSION_SECRET || 'seu-segredo-super-secreto-aqui-2024-fallback';
 
 console.log('✅ Admin credentials loaded:');
 console.log('   Login:', ADMIN_LOGIN);
 console.log('   Password:', ADMIN_PASSWORD ? '***' : 'NOT SET');
 
 // =====================================================
-// CONFIGURAÇÃO DE CORS CORRETA (com Credentials)
+// GERAÇÃO E VERIFICAÇÃO DE TOKEN (sem memory store)
+// =====================================================
+function generateToken(username) {
+    const timestamp = Date.now();
+    const data = `${username}:${timestamp}`;
+    const signature = crypto.createHmac('sha256', TOKEN_SECRET).update(data).digest('hex');
+    return Buffer.from(`${data}:${signature}`).toString('base64');
+}
+
+function verifyToken(token) {
+    try {
+        const decoded = Buffer.from(token, 'base64').toString('utf-8');
+        const parts = decoded.split(':');
+        if (parts.length !== 3) return null;
+
+        const [username, timestamp, signature] = parts;
+        const expectedSignature = crypto.createHmac('sha256', TOKEN_SECRET).update(`${username}:${timestamp}`).digest('hex');
+
+        if (signature !== expectedSignature) return null;
+
+        // Verificar se token não expirou (24 horas)
+        const age = Date.now() - parseInt(timestamp);
+        if (age > 24 * 60 * 60 * 1000) return null;
+
+        return { username, timestamp };
+    } catch (e) {
+        return null;
+    }
+}
+
+// =====================================================
+// CONFIGURAÇÃO DE CORS CORRETA
 // =====================================================
 // Detectar ambiente
 const isDevelopment = process.env.NODE_ENV !== 'production';
@@ -40,25 +72,20 @@ app.use(cors({
             callback(new Error('Not allowed by CORS'));
         }
     },
-    credentials: true, // Permitir cookies/sessão
+    credentials: true,
     methods: ['GET', 'POST', 'OPTIONS'],
-    allowedHeaders: ['Content-Type'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 app.use(bodyParser.json({ limit: '50mb' }));
-app.use(session({
-    secret: process.env.SESSION_SECRET || 'seu-segredo-super-secreto-aqui-2024-fallback',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        secure: process.env.NODE_ENV === 'production', // HTTPS em produção
-        httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000 // 24 horas
-    }
-}));
 
-// Middleware de autenticação
+// Middleware de autenticação (baseado em token, não em sessão)
 const requireAuth = (req, res, next) => {
-    if (req.session.authenticated) {
+    const authHeader = req.headers.authorization || '';
+    const token = authHeader.replace('Bearer ', '');
+
+    const verified = verifyToken(token);
+    if (verified) {
+        req.user = verified;
         next();
     } else {
         res.status(401).json({ error: 'Não autenticado' });
@@ -70,22 +97,25 @@ app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
 
     if (username === ADMIN_LOGIN && password === ADMIN_PASSWORD) {
-        req.session.authenticated = true;
-        res.json({ success: true, message: 'Login realizado!' });
+        const token = generateToken(ADMIN_LOGIN);
+        res.json({ success: true, message: 'Login realizado!', token: token });
     } else {
         res.status(401).json({ success: false, error: 'Usuário ou senha inválidos' });
     }
 });
 
-// Logout
+// Logout (client-side remove o token, apenas retorna sucesso)
 app.post('/api/logout', (req, res) => {
-    req.session.destroy();
     res.json({ success: true, message: 'Logout realizado!' });
 });
 
 // Verificar autenticação
 app.get('/api/auth-status', (req, res) => {
-    res.json({ authenticated: req.session.authenticated || false });
+    const authHeader = req.headers.authorization || '';
+    const token = authHeader.replace('Bearer ', '');
+
+    const verified = verifyToken(token);
+    res.json({ authenticated: !!verified });
 });
 
 // Get current content (PÚBLICO - para que o site principal possa carregar)
@@ -101,7 +131,7 @@ app.post('/api/content', requireAuth, (req, res) => {
     const newContent = req.body;
     fs.writeFile(CONTENT_PATH, JSON.stringify(newContent, null, 2), 'utf8', (err) => {
         if (err) return res.status(500).send('Error saving data');
-        res.send('Content updated successfully');
+        res.json({ success: true, message: 'Content updated successfully' });
     });
 });
 
