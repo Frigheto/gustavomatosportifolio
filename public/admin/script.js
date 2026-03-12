@@ -1,32 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Usar configuração centralizada
     const API_URL = window.APP_CONFIG.API_CONTENT;
-    const AUTH_URL = window.APP_CONFIG.API_AUTH_STATUS;
-    const LOGOUT_URL = window.APP_CONFIG.API_LOGOUT;
-    const LOGIN_PAGE = window.APP_CONFIG.LOGIN_PAGE;
 
     let siteContent = {};
 
-    // ======== GET TOKEN ========
-    // (auth-check.js já garantiu que temos um token válido)
-    function getAuthToken() {
-        // Usar token de window.AUTH_TOKEN (definido por auth-check.js)
-        const token = window.AUTH_TOKEN || localStorage.getItem('auth_token');
-        if (!token) {
-            console.error('❌ NENHUM TOKEN DISPONÍVEL!');
-            window.location.href = LOGIN_PAGE;
-        }
-        return token;
-    }
+    // ======== NOTA: Autenticação removida - Admin acessível diretamente ========
 
-    // ======== LOGOUT ========
-    document.getElementById('logout-btn').addEventListener('click', async () => {
-        if (confirm('Tem certeza que deseja sair?')) {
-            // Remover token do localStorage
-            localStorage.removeItem('auth_token');
-            window.location.href = LOGIN_PAGE;
-        }
-    });
+    // ======== LOGOUT (Desativado - sem autenticação) ========
+    // Logout removido pois admin é agora acessível diretamente
 
     // ======== NAVEGAÇÃO ENTRE ABAS ========
     const navLinks = document.querySelectorAll('.sidebar-nav a');
@@ -50,16 +31,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // ======== CARREGAR CONTEÚDO ========
     async function loadContent() {
         try {
-            const token = getAuthToken();
             console.log('📂 loadContent() iniciado');
             console.log('API_URL:', API_URL);
-            console.log('Token sendo enviado:', token ? `Sim (${token.substring(0, 20)}...)` : 'NÃO');
 
-            const resp = await fetch(API_URL, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+            const resp = await fetch(API_URL);
             console.log('📡 Resposta do servidor:', resp.status);
 
             if (!resp.ok) throw new Error(`Erro ao carregar conteúdo: ${resp.status}`);
@@ -149,8 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const resp = await fetch(API_URL, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${getAuthToken()}`
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(siteContent)
             });
@@ -186,8 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 await fetch(API_URL, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${getAuthToken()}`
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(siteContent)
                 });
@@ -256,8 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
             await fetch(API_URL, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${getAuthToken()}`
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(siteContent)
             });
