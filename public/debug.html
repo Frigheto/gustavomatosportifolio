@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Debug - Teste de Autenticação</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #0d0d0d; color: #e0e0e0; }
+        .box { background: #1a1a1a; padding: 20px; margin: 10px 0; border-left: 4px solid #ffb803; }
+        .success { border-left-color: #00ff00; }
+        .error { border-left-color: #ff0000; }
+    </style>
+</head>
+<body>
+    <h1>🔐 Debug - Teste de Autenticação</h1>
+
+    <div class="box">
+        <h2>1. CONFIG.JS</h2>
+        <p>window.APP_CONFIG definido: <span id="config-status">❌ Não carregado</span></p>
+        <pre id="config-content"></pre>
+    </div>
+
+    <div class="box">
+        <h2>2. LOCALSTORAGE</h2>
+        <p>Token armazenado: <span id="token-status">❌ Não encontrado</span></p>
+        <pre id="token-content"></pre>
+    </div>
+
+    <div class="box">
+        <h2>3. TEST API LOGIN</h2>
+        <p id="api-status">⏳ Testando...</p>
+        <pre id="api-response"></pre>
+    </div>
+
+    <div class="box">
+        <h2>4. TEST API CONTENT</h2>
+        <p id="content-status">⏳ Testando...</p>
+        <pre id="content-response"></pre>
+    </div>
+
+    <!-- Carregar config.js -->
+    <script src="config.js"></script>
+
+    <script>
+        console.log('========== DEBUG SCRIPT INICIADO ==========');
+
+        // 1. Verificar config.js
+        if (window.APP_CONFIG) {
+            document.getElementById('config-status').textContent = '✅ Carregado';
+            document.getElementById('config-content').textContent = JSON.stringify(window.APP_CONFIG, null, 2);
+            console.log('✅ CONFIG.JS CARREGADO:', window.APP_CONFIG);
+        } else {
+            document.getElementById('config-status').textContent = '❌ NÃO CARREGADO';
+            console.error('❌ CONFIG.JS NÃO CARREGADO');
+        }
+
+        // 2. Verificar localStorage
+        const token = localStorage.getItem('auth_token');
+        if (token) {
+            document.getElementById('token-status').textContent = `✅ Encontrado (${token.substring(0, 20)}...)`;
+            document.getElementById('token-content').textContent = token;
+            console.log('✅ TOKEN NO LOCALSTORAGE:', token.substring(0, 20) + '...');
+        } else {
+            document.getElementById('token-status').textContent = '❌ Não encontrado (precisa fazer login primeiro)';
+            console.log('❌ NENHUM TOKEN NO LOCALSTORAGE - Faça login primeiro');
+        }
+
+        // 3. Testar API LOGIN
+        (async () => {
+            try {
+                const response = await fetch(window.APP_CONFIG?.API_LOGIN || 'https://portifoliogmatos.vercel.app/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: 'gustavo matos', password: 'gustavomatos2026' })
+                });
+                const data = await response.json();
+                document.getElementById('api-status').textContent = `${response.ok ? '✅' : '❌'} Status: ${response.status}`;
+                document.getElementById('api-response').textContent = JSON.stringify(data, null, 2);
+                console.log('API_LOGIN Response:', data);
+            } catch (err) {
+                document.getElementById('api-status').textContent = `❌ Erro: ${err.message}`;
+                console.error('API_LOGIN Error:', err);
+            }
+        })();
+
+        // 4. Testar API CONTENT (se houver token)
+        if (token) {
+            (async () => {
+                try {
+                    const response = await fetch(window.APP_CONFIG?.API_CONTENT || 'https://portifoliogmatos.vercel.app/api/content', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const data = await response.json();
+                    document.getElementById('content-status').textContent = `${response.ok ? '✅' : '❌'} Status: ${response.status}`;
+                    document.getElementById('content-response').textContent = JSON.stringify(data, null, 2).substring(0, 500) + '...';
+                    console.log('API_CONTENT Response:', data);
+                } catch (err) {
+                    document.getElementById('content-status').textContent = `❌ Erro: ${err.message}`;
+                    console.error('API_CONTENT Error:', err);
+                }
+            })();
+        } else {
+            document.getElementById('content-status').textContent = '⏭️ Pulado (sem token)';
+        }
+    </script>
+</body>
+</html>
