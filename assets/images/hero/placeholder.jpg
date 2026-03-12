@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080">
+  <defs>
+    <linearGradient id="gradHero" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a1a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0a0a0a;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#gradHero)"/>
+  <circle cx="960" cy="540" r="300" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.3"/>
+  <circle cx="960" cy="540" r="200" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.2"/>
+  <text x="960" y="540" font-family="Montserrat, sans-serif" font-size="72" font-weight="700" text-anchor="middle" fill="#ffffff" opacity="0.5">GUSTAVO MATOS</text>
+  <text x="960" y="620" font-family="Montserrat, sans-serif" font-size="24" text-anchor="middle" fill="#888888" opacity="0.4" letter-spacing="3">DANÇARINO · PROFESSOR · ARTISTA</text>
+</svg>
