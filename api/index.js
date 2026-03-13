@@ -4,61 +4,46 @@ const fs = require('fs');
 const path = require('path');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const { Redis } = require('@upstash/redis');
 
 const app = express();
 
 // Detectar ambiente
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
-// Caminho para content.json
-// Em desenvolvimento: usar arquivo no public/
-// Em produção Vercel: usar /tmp (que funciona durante requisição)
-let CONTENT_PATH;
-if (isDevelopment) {
-    CONTENT_PATH = path.join(process.cwd(), 'public', 'content.json');
-} else {
-    CONTENT_PATH = '/tmp/content.json';
+// Inicializar Redis
+let redis = null;
+try {
+    // Vercel auto-injeta as variávies quando conectamos a integração do Upstash
+    if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
+        redis = new Redis({
+            url: process.env.KV_REST_API_URL,
+            token: process.env.KV_REST_API_TOKEN
+        });
+    } else {
+        console.warn('⚠️ AVISO: Variáveis do Vercel KV (Upstash) não encontradas!');
+    }
+} catch (e) {
+    console.error("Erro ao inicializar Redis:", e);
 }
+
+// Caminho de Fallback para desenvolvimento local
+const LOCAL_CONTENT_PATH = path.join(process.cwd(), 'public', 'content.json');
 
 console.log('✅ API iniciada - Admin sem autenticação (público)');
 console.log('🌍 Ambiente:', isDevelopment ? 'DESENVOLVIMENTO' : 'PRODUÇÃO (VERCEL)');
-console.log('📂 process.cwd():', process.cwd());
-console.log('📁 CONTENT_PATH:', CONTENT_PATH);
+console.log('🛢️  Redis (Upstash) conectado:', !!redis);
 
-// Verificar se arquivo existe
-if (fs.existsSync(CONTENT_PATH)) {
-    console.log('✅ Arquivo content.json encontrado');
-} else {
-    console.warn('⚠️ Arquivo content.json NÃO encontrado, criando arquivo padrão...');
-
-    // Tentar copiar do public/
-    const sourceFile = path.join(process.cwd(), 'public', 'content.json');
-    if (fs.existsSync(sourceFile)) {
-        try {
-            const data = fs.readFileSync(sourceFile, 'utf8');
-            fs.writeFileSync(CONTENT_PATH, data, 'utf8');
-            console.log('✅ Arquivo copiado com sucesso');
-        } catch (err) {
-            console.error('❌ Erro ao copiar arquivo:', err.message);
-        }
-    }
-}
 
 // =====================================================
-// TOKEN REMOVIDO - Admin agora é público
+// CONFIGURAÇÃO DE CORS
 // =====================================================
-
-// =====================================================
-// CONFIGURAÇÃO DE CORS CORRETA
-// =====================================================
-// Definir origens permitidas
 const allowedOrigins = isDevelopment
     ? ['http://localhost:5173', 'http://localhost:3001', 'http://127.0.0.1:5173']
-    : ['https://portifoliogmatos.vercel.app']; // Produção no Vercel
+    : ['https://portifoliogmatos.vercel.app'];
 
 app.use(cors({
     origin: (origin, callback) => {
-        // Permitir requisições sem origin (como mobile apps ou curl)
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
@@ -71,37 +56,83 @@ app.use(cors({
 }));
 app.use(bodyParser.json({ limit: '50mb' }));
 
-// Middleware de autenticação removido - admin agora é público
 
-// Login/Logout/Auth removidos - Admin é público
-
-// Get current content (PÚBLICO - para que o site principal possa carregar)
-app.get('/api/content', (req, res) => {
-    console.log('📖 GET /api/content - lendo de:', CONTENT_PATH);
-    fs.readFile(CONTENT_PATH, 'utf8', (err, data) => {
-        if (err) {
-            console.error('❌ Erro ao ler:', err.message);
-            return res.status(500).send('Error reading data');
+// Função auxiliar para inicializar do disco para o Redis caso o Redis esteja vazio na primeira vez
+async function initRedisIfNeeded() {
+    if (!redis) return;
+    try {
+        const existingContent = await redis.get('site_content');
+        if (!existingContent && fs.existsSync(LOCAL_CONTENT_PATH)) {
+            console.log('📥 Inicializando Redis com o conteúdo local default...');
+            const defaultData = fs.readFileSync(LOCAL_CONTENT_PATH, 'utf8');
+            await redis.set('site_content', JSON.parse(defaultData));
+            console.log('✅ Redis inicializado com sucesso.');
         }
-        console.log('✅ Conteúdo lido com sucesso');
-        res.json(JSON.parse(data));
-    });
+    } catch (e) {
+        console.error("Falha ao checar/inicializar Redis:", e);
+    }
+}
+initRedisIfNeeded();
+
+
+// Get current content
+app.get('/api/content', async (req, res) => {
+    try {
+        if (redis) {
+            console.log('📖 GET /api/content - lendo do REDIS (Upstash)');
+            const data = await redis.get('site_content');
+            if (data) {
+                return res.json(typeof data === 'string' ? JSON.parse(data) : data);
+            }
+        }
+        
+        // Fallback para arquivo local (se não tiver redis)
+        console.log('📖 GET /api/content - lendo do ARQUIVO LOCAL fallback');
+        fs.readFile(LOCAL_CONTENT_PATH, 'utf8', (err, data) => {
+            if (err) {
+                console.error('❌ Erro ao ler local fallback:', err.message);
+                return res.status(500).send('Error reading data');
+            }
+            res.json(JSON.parse(data));
+        });
+    } catch (e) {
+        console.error('❌ Erro no GET /api/content:', e);
+        res.status(500).json({ error: 'Server error', details: e.message });
+    }
 });
 
-// Update content (PUBLIC - admin é acessível diretamente)
-app.post('/api/content', (req, res) => {
+// Update content
+app.post('/api/content', async (req, res) => {
     const newContent = req.body;
-    console.log('💾 Tentando salvar em:', CONTENT_PATH);
-    fs.writeFile(CONTENT_PATH, JSON.stringify(newContent, null, 2), 'utf8', (err) => {
-        if (err) {
-            console.error('❌ Erro ao salvar:', err.message);
-            console.error('   Código:', err.code);
-            console.error('   Path:', CONTENT_PATH);
-            return res.status(500).json({ error: 'Error saving data', details: err.message });
+    
+    try {
+        let savedToRedis = false;
+        
+        // Salvar no Redis se estiver em Produção/Conectado
+        if (redis) {
+            console.log('💾 Tentando salvar no REDIS (Upstash)...');
+            await redis.set('site_content', newContent);
+            savedToRedis = true;
+            console.log('✅ Salvo no Redis com sucesso!');
         }
-        console.log('✅ Arquivo salvo com sucesso');
-        res.json({ success: true, message: 'Content updated successfully' });
-    });
+
+        // Se local/desenvolvimento, salvar também no disco
+        if (isDevelopment || !redis) {
+            console.log('💾 Tentando salvar no DISCO (Fallback / Local)...');
+            fs.writeFile(LOCAL_CONTENT_PATH, JSON.stringify(newContent, null, 2), 'utf8', (err) => {
+                if (err) {
+                    console.error('❌ Erro ao salvar log local:', err);
+                } else {
+                    console.log('✅ Salvo localmente.');
+                }
+            });
+        }
+        
+        res.json({ success: true, message: 'Content updated successfully', savedToRedis });
+    } catch (e) {
+        console.error('❌ Erro no POST /api/content:', e);
+        res.status(500).json({ error: 'Error saving data', details: e.message });
+    }
 });
 
 // List images (PÚBLICO)
