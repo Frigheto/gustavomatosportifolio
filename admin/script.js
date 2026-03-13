@@ -96,7 +96,8 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadContent() {
         try {
             const resp = await fetch(API_URL, {
-                credentials: 'include'
+                credentials: 'include',
+                cache: 'no-store'
             });
             if (!resp.ok) throw new Error('Erro ao carregar conteúdo');
             siteContent = await resp.json();
@@ -259,7 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 const result = await resp.json();
                 if (resp.ok && result.success) {
-                    renderVideos();
+                    await loadContent();
                     showToast('Vídeo deletado com sucesso!');
                 } else {
                     showToast('Falha ao deletar: ' + (result.error || 'Erro desconhecido'), true);
@@ -334,7 +335,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await resp.json();
             if (resp.ok && result.success) {
                 videoModal.style.display = 'none';
-                renderVideos();
+                await loadContent();
                 showToast('Vídeo salvo com sucesso!');
             } else {
                 showToast('Falha ao salvar: ' + (result.error || 'Erro desconhecido'), true);

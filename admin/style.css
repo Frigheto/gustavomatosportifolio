@@ -577,6 +577,10 @@ body {
     padding: 20px;
 }
 
+#photo-modal {
+    z-index: 10000;
+}
+
 .modal-content {
     background: #111;
     width: 95%;
