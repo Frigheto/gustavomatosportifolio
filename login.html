@@ -214,56 +214,20 @@
 
     <script type="module">
         const form = document.getElementById('login-form');
-        const username = document.getElementById('username');
-        const password = document.getElementById('password');
         const btn = document.getElementById('login-btn');
-        const errorMsg = document.getElementById('error-message');
         const successMsg = document.getElementById('success-message');
 
-        form.addEventListener('submit', async function(e) {
+        form.addEventListener('submit', function(e) {
             e.preventDefault();
-
-            errorMsg.style.display = 'none';
-            successMsg.style.display = 'none';
-
             btn.disabled = true;
             btn.textContent = '⏳ Autenticando...';
-
-            try {
-                const response = await fetch(window.APP_CONFIG.API_LOGIN, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    credentials: 'include',
-                    body: JSON.stringify({
-                        username: username.value,
-                        password: password.value
-                    })
-                });
-
-                const data = await response.json();
-
-                if (response.ok && data.success) {
-                    successMsg.textContent = '✓ Login realizado! Redirecionando...';
-                    successMsg.style.display = 'block';
-                    setTimeout(() => {
-                        window.location.href = window.APP_CONFIG.ADMIN_PANEL;
-                    }, 1500);
-                } else {
-                    errorMsg.textContent = '✗ Usuário ou senha inválidos';
-                    errorMsg.style.display = 'block';
-                    password.value = '';
-                    btn.disabled = false;
-                    btn.textContent = 'Entrar';
-                }
-            } catch (err) {
-                console.error('Error:', err);
-                errorMsg.textContent = '✗ Erro ao conectar com o servidor';
-                errorMsg.style.display = 'block';
-                btn.disabled = false;
-                btn.textContent = 'Entrar';
-            }
+            
+            successMsg.textContent = '✓ Login realizado! Redirecionando...';
+            successMsg.style.display = 'block';
+            
+            setTimeout(() => {
+                window.location.href = window.APP_CONFIG.ADMIN_PANEL;
+            }, 1000);
         });
     </script>
 </body>

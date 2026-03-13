@@ -51,18 +51,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ======== VERIFICAR AUTENTICAÇÃO ========
     async function checkAuth() {
-        try {
-            const resp = await fetch(AUTH_URL, {
-                credentials: 'include'
-            });
-            const data = await resp.json();
-            if (!data.authenticated) {
-                window.location.href = LOGIN_PAGE;
-            }
-        } catch (err) {
-            console.error('Auth check error:', err);
-            window.location.href = LOGIN_PAGE;
-        }
+        // Autenticação desativada
+        // O painel agora é público, usando rotas públicas
+        return true;
     }
 
     // ======== LOGOUT ========
