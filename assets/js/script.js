@@ -9,6 +9,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // ============ MOBILE MENU TOGGLE ============
+  const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+  const navLinks = document.querySelector('.nav-links');
+
+  if (mobileMenuToggle) {
+    mobileMenuToggle.addEventListener('click', () => {
+      mobileMenuToggle.classList.toggle('active');
+      navLinks.classList.toggle('active');
+      document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : 'auto';
+    });
+
+    // Fechar menu ao clicar em um link
+    const navItems = document.querySelectorAll('.nav-links a');
+    navItems.forEach(item => {
+      item.addEventListener('click', () => {
+        mobileMenuToggle.classList.remove('active');
+        navLinks.classList.remove('active');
+        document.body.style.overflow = 'auto';
+      });
+    });
+  }
+
   // ============ REVEAL ANIMATIONS ============
   const revealElements = document.querySelectorAll('[data-reveal]');
   const revealObserver = new IntersectionObserver((entries) => {
