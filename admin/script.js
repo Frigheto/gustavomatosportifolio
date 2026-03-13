@@ -11,6 +11,7 @@ function openPhotoModal(target) {
     if (target === 'hero') labelText = 'Imagem do Topo (Hero)';
     else if (target === 'bio') labelText = 'Imagem da Apresentação (Bio)';
     else if (target === 'contact') labelText = 'Foto do Rodapé (Contato)';
+    else if (target === 'video-thumb') labelText = 'Thumbnail do Vídeo';
 
     modalTargetLabel.innerText = labelText;
     photoModal.style.display = 'flex';
@@ -351,6 +352,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     let targetInputId = 'hero-img-path'; // default
                     if (currentPhotoTarget === 'bio') targetInputId = 'bio-img-path';
                     else if (currentPhotoTarget === 'contact') targetInputId = 'contact-img-path';
+                    else if (currentPhotoTarget === 'video-thumb') targetInputId = 'v-thumb';
 
                     document.getElementById(targetInputId).value = caminho;
                     closePhotoModal();
