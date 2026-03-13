@@ -1,23 +1,23 @@
 {
   "hero": {
-    "image": "assets/images/fotos-artista/IMG_9621.JPG.jpeg",
+    "image": "assets/images/fotos-artista/IMG_9627.JPG.jpeg",
     "bgText": "GUSTAVO MATOS GUSTAVO MATOS GUSTAVO MATOS"
   },
   "presentation": {
-    "image": "assets/images/fotos-artista/IMG_9630.JPG.jpeg",
+    "image": "assets/images/fotos-artista/IMG_9634.JPG.jpeg",
     "bio1": "Teste",
     "bio2": "Bio",
     "cards": []
   },
   "contact": {
-    "image": "assets/images/fotos-artista/IMG_9628.JPG.jpeg"
+    "image": "assets/images/fotos-artista/IMG_9632.JPG.jpeg"
   },
   "videos": [
     {
       "id": "demo-001",
-      "title": "Apresentação ao Vivo",
-      "tag": "TESTE TESTE",
-      "description": "TESTE TESTE",
+      "title": "http://localhost:3001/",
+      "tag": "http://localhost:3001/",
+      "description": "http://localhost:3001/",
       "image": "https://drive.google.com/uc?export=view&id=1MLOcgPQs6En5qpmkZO8NJz9Q2q34vonz",
       "link": "https://drive.google.com/file/d/1MLOcgPQs6En5qpmkZO8NJz9Q2q34vonz/preview"
     },

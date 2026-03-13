@@ -104,34 +104,39 @@ app.get('/api/content', async (req, res) => {
 // Update content
 app.post('/api/content', async (req, res) => {
     const newContent = req.body;
-    
-    try {
-        let savedToRedis = false;
-        
-        // Salvar no Redis se estiver em Produção/Conectado
-        if (redis) {
-            console.log('💾 Tentando salvar no REDIS (Upstash)...');
-            await redis.set('site_content', newContent);
-            savedToRedis = true;
-            console.log('✅ Salvo no Redis com sucesso!');
-        }
 
-        // Se local/desenvolvimento, salvar também no disco
-        if (isDevelopment || !redis) {
-            console.log('💾 Tentando salvar no DISCO (Fallback / Local)...');
-            fs.writeFile(LOCAL_CONTENT_PATH, JSON.stringify(newContent, null, 2), 'utf8', (err) => {
-                if (err) {
-                    console.error('❌ Erro ao salvar log local:', err);
-                } else {
-                    console.log('✅ Salvo localmente.');
-                }
+    try {
+        // Em produção, Redis é obrigatório
+        if (!isDevelopment && !redis) {
+            console.error('❌ Redis não está disponível em produção. Configure KV_REST_API_URL e KV_REST_API_TOKEN no painel da Vercel.');
+            return res.status(503).json({
+                error: 'Banco de dados não disponível. Configure as variáveis KV_REST_API_URL e KV_REST_API_TOKEN na Vercel.',
+                savedToRedis: false
             });
         }
-        
-        res.json({ success: true, message: 'Content updated successfully', savedToRedis });
+
+        // Salvar no Redis se estiver conectado
+        if (redis) {
+            console.log('💾 Salvando no REDIS (Upstash)...');
+            await redis.set('site_content', newContent);
+            console.log('✅ Salvo no Redis com sucesso!');
+            return res.json({ success: true, message: 'Conteúdo salvo com sucesso!', savedToRedis: true });
+        }
+
+        // Desenvolvimento: salvar no disco local
+        console.log('💾 Salvando no DISCO (modo desenvolvimento)...');
+        await new Promise((resolve, reject) => {
+            fs.writeFile(LOCAL_CONTENT_PATH, JSON.stringify(newContent, null, 2), 'utf8', (err) => {
+                if (err) reject(err);
+                else resolve();
+            });
+        });
+        console.log('✅ Salvo localmente.');
+        res.json({ success: true, message: 'Conteúdo salvo localmente!', savedToRedis: false });
+
     } catch (e) {
         console.error('❌ Erro no POST /api/content:', e);
-        res.status(500).json({ error: 'Error saving data', details: e.message });
+        res.status(500).json({ error: 'Erro ao salvar dados', details: e.message });
     }
 });
 

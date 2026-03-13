@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
             card.className = 'video-card';
             card.innerHTML = `
                 <div class="video-card-image">
-                    <img src="${video.image}" alt="${video.title}" onerror="this.src='https://via.placeholder.com/300x200?text=Sem+Imagem'">
+                    <img src="${video.image}" alt="${video.title}" onerror="this.style.background='#333';this.style.minHeight='120px';this.removeAttribute('src')">
                 </div>
                 <div class="video-card-content">
                     <h3>${video.title}</h3>
@@ -218,10 +218,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 credentials: 'include',
                 body: JSON.stringify(siteContent)
             });
-            if (resp.ok) {
+            const result = await resp.json();
+            if (resp.ok && result.success) {
                 showToast('Fotos salvas com sucesso!');
             } else {
-                showToast('Falha ao salvar fotos.', true);
+                showToast('Falha ao salvar: ' + (result.error || 'Erro desconhecido'), true);
+                console.error('Erro ao salvar fotos:', result);
             }
         } catch (err) {
             showToast('Erro ao salvar fotos', true);
@@ -249,14 +251,20 @@ document.addEventListener('DOMContentLoaded', () => {
         if (confirm('Tem certeza que deseja deletar este vídeo?')) {
             siteContent.videos.splice(index, 1);
             try {
-                await fetch(API_URL, {
+                const resp = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'include',
                     body: JSON.stringify(siteContent)
                 });
-                renderVideos();
-                showToast('Vídeo deletado com sucesso!');
+                const result = await resp.json();
+                if (resp.ok && result.success) {
+                    renderVideos();
+                    showToast('Vídeo deletado com sucesso!');
+                } else {
+                    showToast('Falha ao deletar: ' + (result.error || 'Erro desconhecido'), true);
+                    console.error('Erro ao deletar vídeo:', result);
+                }
             } catch (err) {
                 showToast('Erro ao deletar vídeo', true);
                 console.error(err);
@@ -317,15 +325,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            await fetch(API_URL, {
+            const resp = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
                 body: JSON.stringify(siteContent)
             });
-            videoModal.style.display = 'none';
-            renderVideos();
-            showToast('Vídeo salvo com sucesso!');
+            const result = await resp.json();
+            if (resp.ok && result.success) {
+                videoModal.style.display = 'none';
+                renderVideos();
+                showToast('Vídeo salvo com sucesso!');
+            } else {
+                showToast('Falha ao salvar: ' + (result.error || 'Erro desconhecido'), true);
+                console.error('Erro ao salvar vídeo:', result);
+            }
         } catch (err) {
             showToast('Erro ao salvar vídeo', true);
             console.error(err);
