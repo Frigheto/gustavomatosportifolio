@@ -1,9 +1,51 @@
+// ======== MODAL DE FOTOS (GLOBAL SCOPE) ========
+let currentPhotoTarget = '';
+
+function openPhotoModal(target) {
+    const photoModal = document.getElementById('photo-modal');
+    const modalTargetLabel = document.getElementById('modal-target-label');
+
+    currentPhotoTarget = target;
+
+    let labelText = 'Imagem';
+    if (target === 'hero') labelText = 'Imagem do Topo (Hero)';
+    else if (target === 'bio') labelText = 'Imagem da Apresentação (Bio)';
+    else if (target === 'contact') labelText = 'Foto do Rodapé (Contato)';
+
+    modalTargetLabel.innerText = labelText;
+    photoModal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closePhotoModal() {
+    const photoModal = document.getElementById('photo-modal');
+    photoModal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+// ======== INICIALIZAR EVENTOS DO MODAL ========
+function setupModalEvents() {
+    const photoModal = document.getElementById('photo-modal');
+    if (!photoModal) return;
+
+    // Fechar modal ao clicar fora do conteúdo
+    photoModal.addEventListener('click', (e) => {
+        if (e.target === photoModal) closePhotoModal();
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    // Definir funções no window para acesso via HTML onclick
+    window.openPhotoModal = openPhotoModal;
+    window.closePhotoModal = closePhotoModal;
+    setupModalEvents();
+
     // Usar configuração centralizada
     const API_URL = window.APP_CONFIG.API_CONTENT;
     const AUTH_URL = window.APP_CONFIG.API_AUTH_STATUS;
     const LOGOUT_URL = window.APP_CONFIG.API_LOGOUT;
     const LOGIN_PAGE = window.APP_CONFIG.LOGIN_PAGE;
+    const API_IMAGES = window.APP_CONFIG.API_LIST_IMAGES;
 
     let siteContent = {};
 
@@ -74,6 +116,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!siteContent.presentation) {
                 siteContent.presentation = { image: '', bio1: '', bio2: '', cards: [] };
             }
+            if (!siteContent.contact) {
+                siteContent.contact = { image: '' };
+            }
             if (!siteContent.videos || !Array.isArray(siteContent.videos)) {
                 siteContent.videos = [];
             }
@@ -89,6 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function populateForms() {
         document.getElementById('hero-img-path').value = siteContent.hero?.image || '';
         document.getElementById('bio-img-path').value = siteContent.presentation?.image || '';
+        document.getElementById('contact-img-path').value = siteContent.contact?.image || '';
         document.getElementById('hero-bg-text').value = siteContent.hero?.bgText || '';
     }
 
@@ -123,27 +169,54 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // ======== FUNÇÃO: Toast Notification ========
+    function showToast(message, isError = false) {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+
+        const toast = document.createElement('div');
+        toast.className = `toast ${isError ? 'error' : ''}`;
+
+        const icon = isError ? '❌' : '✅';
+        toast.innerHTML = `<span class="toast-icon">${icon}</span> <span>${message}</span>`;
+
+        container.appendChild(toast);
+
+        // Trigger reflow for animation
+        void toast.offsetWidth;
+        toast.classList.add('show');
+
+        // Remove after 3 seconds
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => {
+                toast.remove();
+            }, 300); // Wait for transition
+        }, 3000);
+    }
+
     // ======== FUNÇÃO: Converter links do Google Drive ========
     const convertGoogleDriveLink = (url) => {
-      if (!url || !url.includes('drive.google.com')) return url;
+        if (!url || !url.includes('drive.google.com')) return url;
 
-      // Extrair FILE_ID do link do Google Drive
-      const fileIdMatch = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
-      if (fileIdMatch) {
-        const fileId = fileIdMatch[1];
-        // Retornar no formato que funciona para imagens
-        return `https://drive.google.com/uc?export=view&id=${fileId}`;
-      }
-      return url;
+        // Extrair FILE_ID do link do Google Drive
+        const fileIdMatch = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
+        if (fileIdMatch) {
+            const fileId = fileIdMatch[1];
+            // Retornar no formato que funciona para imagens
+            return `https://drive.google.com/uc?export=view&id=${fileId}`;
+        }
+        return url;
     };
 
     // ======== SALVAR FOTOS ========
     document.getElementById('images-form').addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        // Converter links do Google Drive automaticamente
-        siteContent.hero.image = convertGoogleDriveLink(document.getElementById('hero-img-path').value);
-        siteContent.presentation.image = convertGoogleDriveLink(document.getElementById('bio-img-path').value);
+        // Salvar apenas os caminhos locais já selecionados
+        siteContent.hero.image = document.getElementById('hero-img-path').value;
+        siteContent.presentation.image = document.getElementById('bio-img-path').value;
+        siteContent.contact.image = document.getElementById('contact-img-path').value;
         siteContent.hero.bgText = document.getElementById('hero-bg-text').value;
 
         try {
@@ -154,16 +227,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify(siteContent)
             });
             if (resp.ok) {
-                alert('✓ Fotos salvas com sucesso!');
+                showToast('Fotos salvas com sucesso!');
+            } else {
+                showToast('Falha ao salvar fotos.', true);
             }
         } catch (err) {
-            alert('✗ Erro ao salvar fotos');
+            showToast('Erro ao salvar fotos', true);
             console.error(err);
         }
     });
 
     // ======== MODAL DE VÍDEOS ========
-    const modal = document.getElementById('video-modal');
+    const videoModal = document.getElementById('video-modal');
     const videoForm = document.getElementById('video-form');
 
     window.editVideo = (index) => {
@@ -175,7 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('v-desc').value = v.description;
         document.getElementById('v-thumb').value = v.image;
         document.getElementById('v-link').value = v.link || '';
-        modal.style.display = 'flex';
+        videoModal.style.display = 'flex';
     };
 
     window.deleteVideo = async (index) => {
@@ -189,9 +264,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: JSON.stringify(siteContent)
                 });
                 renderVideos();
-                alert('✓ Vídeo deletado com sucesso!');
+                showToast('Vídeo deletado com sucesso!');
             } catch (err) {
-                alert('✗ Erro ao deletar vídeo');
+                showToast('Erro ao deletar vídeo', true);
                 console.error(err);
             }
         }
@@ -201,21 +276,21 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('modal-title').innerText = 'Novo Vídeo';
         videoForm.reset();
         document.getElementById('v-index').value = '';
-        modal.style.display = 'flex';
+        videoModal.style.display = 'flex';
     });
 
     document.getElementById('close-modal-btn').addEventListener('click', () => {
-        modal.style.display = 'none';
+        videoModal.style.display = 'none';
     });
 
     document.getElementById('cancel-modal-btn').addEventListener('click', () => {
-        modal.style.display = 'none';
+        videoModal.style.display = 'none';
     });
 
     // Fechar modal ao clicar fora
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            modal.style.display = 'none';
+    videoModal.addEventListener('click', (e) => {
+        if (e.target === videoModal) {
+            videoModal.style.display = 'none';
         }
     });
 
@@ -228,10 +303,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // Converter links do Google Drive automaticamente
         thumbUrl = convertGoogleDriveLink(thumbUrl);
         if (videoLink.includes('drive.google.com')) {
-          const fileIdMatch = videoLink.match(/\/d\/([a-zA-Z0-9-_]+)/);
-          if (fileIdMatch) {
-            videoLink = `https://drive.google.com/file/d/${fileIdMatch[1]}/preview`;
-          }
+            const fileIdMatch = videoLink.match(/\/d\/([a-zA-Z0-9-_]+)/);
+            if (fileIdMatch) {
+                videoLink = `https://drive.google.com/file/d/${fileIdMatch[1]}/preview`;
+            }
         }
 
         const videoData = {
@@ -256,58 +331,46 @@ document.addEventListener('DOMContentLoaded', () => {
                 credentials: 'include',
                 body: JSON.stringify(siteContent)
             });
-            modal.style.display = 'none';
+            videoModal.style.display = 'none';
             renderVideos();
-            alert('✓ Vídeo salvo com sucesso!');
+            showToast('Vídeo salvo com sucesso!');
         } catch (err) {
-            alert('✗ Erro ao salvar vídeo');
+            showToast('Erro ao salvar vídeo', true);
             console.error(err);
         }
     });
 
-    // ======== GALERIA DE FOTOS DO ARTISTA ========
-    function loadPhotosGallery() {
+    // ======== GALERIA NO MODAL ========
+    async function loadPhotosGallery() {
         const gallery = document.getElementById('photos-gallery');
-        const fotos = [
-            'IMG_9621.JPG.jpeg',
-            'IMG_9622.JPG.jpeg',
-            'IMG_9623.JPG.jpeg',
-            'IMG_9624.JPG.jpeg',
-            'IMG_9625.JPG.jpeg',
-            'IMG_9626.JPG.jpeg',
-            'IMG_9627.JPG.jpeg',
-            'IMG_9628.JPG.jpeg',
-            'IMG_9629.JPG.jpeg',
-            'IMG_9630.JPG.jpeg',
-            'IMG_9631.JPG.jpeg',
-            'IMG_9632.JPG.jpeg',
-            'IMG_9633.JPG.jpeg',
-            'IMG_9634.JPG.jpeg',
-            'IMG_9635.JPG.jpeg',
-            'IMG_9636.JPG.jpeg',
-            'IMG_9637.JPG.jpeg',
-            'IMG_9638.JPG.jpeg',
-            'IMG_9639.JPG.jpeg'
-        ];
 
-        fotos.forEach((foto) => {
-            const img = document.createElement('img');
-            const caminho = `assets/images/fotos-artista/${foto}`;
-            img.src = caminho;
-            img.alt = foto;
-            img.style.cursor = 'pointer';
+        try {
+            const resp = await fetch(API_IMAGES);
+            const fotos = await resp.json();
 
-            img.addEventListener('click', () => {
-                // Remover seleção anterior
-                document.querySelectorAll('#photos-gallery img').forEach(i => i.classList.remove('selected'));
-                // Adicionar seleção
-                img.classList.add('selected');
-                // Preencher o input
-                document.getElementById('hero-img-path').value = caminho;
+            gallery.innerHTML = '';
+            fotos.forEach((foto) => {
+                const img = document.createElement('img');
+                const caminho = `assets/images/fotos-artista/${foto}`;
+                img.src = `../${caminho}`;
+                img.alt = foto;
+                img.loading = 'lazy';
+
+                img.addEventListener('click', () => {
+                    let targetInputId = 'hero-img-path'; // default
+                    if (currentPhotoTarget === 'bio') targetInputId = 'bio-img-path';
+                    else if (currentPhotoTarget === 'contact') targetInputId = 'contact-img-path';
+
+                    document.getElementById(targetInputId).value = caminho;
+                    closePhotoModal();
+                });
+
+                gallery.appendChild(img);
             });
-
-            gallery.appendChild(img);
-        });
+        } catch (err) {
+            console.error('Error loading gallery:', err);
+            gallery.innerHTML = '<p style="color: #ff4444;">Erro ao carregar fotos.</p>';
+        }
     }
 
     // ======== INICIALIZAR ========

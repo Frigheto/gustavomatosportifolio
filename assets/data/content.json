@@ -1,13 +1,16 @@
 {
   "hero": {
-    "image": "https://drive.google.com/uc?export=view&id=1_hO1S5SECZmgHunm48nxQyXL1Ec1l695",
+    "image": "assets/images/fotos-artista/IMG_9621.JPG.jpeg",
     "bgText": "GUSTAVO MATOS GUSTAVO MATOS GUSTAVO MATOS"
   },
   "presentation": {
-    "image": "https://drive.google.com/uc?export=view&id=1_hO1S5SECZmgHunm48nxQyXL1Ec1l695",
+    "image": "assets/images/fotos-artista/IMG_9630.JPG.jpeg",
     "bio1": "Teste",
     "bio2": "Bio",
     "cards": []
+  },
+  "contact": {
+    "image": "assets/images/fotos-artista/IMG_9628.JPG.jpeg"
   },
   "videos": [
     {
@@ -15,24 +18,24 @@
       "title": "Apresentação ao Vivo",
       "tag": "TESTE TESTE",
       "description": "TESTE TESTE",
-      "image": "https://drive.google.com/uc?export=view&id=1_hO1S5SECZmgHunm48nxQyXL1Ec1l695",
+      "image": "https://drive.google.com/uc?export=view&id=1MLOcgPQs6En5qpmkZO8NJz9Q2q34vonz",
       "link": "https://drive.google.com/file/d/1MLOcgPQs6En5qpmkZO8NJz9Q2q34vonz/preview"
     },
     {
       "id": "new-video",
-      "title": "Novo Vídeo Teste",
-      "tag": "TESTE TESTE",
-      "description": "TESTE TESTE",
-      "image": "https://drive.google.com/uc?export=view&id=1_hO1S5SECZmgHunm48nxQyXL1Ec1l695",
-      "link": "https://drive.google.com/file/d/1MLOcgPQs6En5qpmkZO8NJz9Q2q34vonz/preview"
+      "title": "teste 2",
+      "tag": "teste 2",
+      "description": "teste 2",
+      "image": "https://drive.google.com/uc?export=view&id=1ttMjhH5B1w-_jEmIJiIqm61OpF1tv-Ih",
+      "link": "https://drive.google.com/file/d/1ttMjhH5B1w-_jEmIJiIqm61OpF1tv-Ih/preview"
     },
     {
       "id": "novo-1773337971",
-      "title": "Novo Vídeo - Teste",
-      "tag": "TESTE TESTE",
-      "description": "TESTE TESTE",
-      "image": "https://drive.google.com/uc?export=view&id=1_hO1S5SECZmgHunm48nxQyXL1Ec1l695",
-      "link": "https://youtube.com/watch?v=test"
+      "title": "teste 3",
+      "tag": "teste 3",
+      "description": "teste 3",
+      "image": "https://drive.google.com/uc?export=view&id=1-GwmanfXrgyN8cQUisqNKmkWwtgjQfzv",
+      "link": "https://drive.google.com/file/d/1-GwmanfXrgyN8cQUisqNKmkWwtgjQfzv/preview"
     }
   ]
 }

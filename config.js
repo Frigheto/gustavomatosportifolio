@@ -13,7 +13,7 @@
 
 // Detectar ambiente (desenvolvimento vs produção)
 const isDevelopment = window.location.hostname === 'localhost' ||
-                      window.location.hostname === '127.0.0.1';
+  window.location.hostname === '127.0.0.1';
 
 // =====================================================
 // CONFIGURAÇÃO DE URLs
@@ -32,14 +32,15 @@ const CONFIG = {
     API_LOGOUT: 'http://localhost:3001/api/logout',
     API_AUTH_STATUS: 'http://localhost:3001/api/auth-status',
 
-    // URLs do frontend (Vite em 5173)
-    FRONTEND_BASE: 'http://localhost:5173',
-    ADMIN_PANEL: 'http://localhost:5173/admin/',
-    LOGIN_PAGE: 'http://localhost:5173/login.html',
-    HOME_PAGE: 'http://localhost:5173/',
+    // URLs do frontend (Vite - detecta porta automaticamente)
+    FRONTEND_BASE: `http://localhost:${window.location.port || 5173}`,
+    ADMIN_PANEL: `http://localhost:${window.location.port || 5173}/admin/`,
+    LOGIN_PAGE: `http://localhost:${window.location.port || 5173}/login.html`,
+    HOME_PAGE: `http://localhost:${window.location.port || 5173}/`,
 
     // CORS Origin (origem permitida no servidor)
-    CORS_ORIGIN: 'http://localhost:5173',
+    CORS_ORIGIN: `http://localhost:${window.location.port || 5173}`,
+    API_LIST_IMAGES: 'http://localhost:3001/api/images',
   },
 
   // ==================== PRODUÇÃO ====================
@@ -60,6 +61,7 @@ const CONFIG = {
 
     // CORS Origin (origem permitida no servidor)
     CORS_ORIGIN: 'https://portifoliogmatos.vercel.app',
+    API_LIST_IMAGES: 'https://portifoliogmatos.vercel.app/api/images',
   }
 };
 

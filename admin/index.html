@@ -40,21 +40,44 @@
             <!-- Seção: Fotos do Site -->
             <section id="fotos" class="section-card">
                 <h2>Fotos do Site</h2>
-                <p style="color: #999; font-size: 0.9rem; margin-bottom: 1.5rem;">Altere as imagens principais que aparecem no site</p>
+                <p style="color: #999; font-size: 0.9rem; margin-bottom: 1.5rem;">Altere as imagens principais que
+                    aparecem no site</p>
 
                 <form id="images-form">
                     <!-- Imagem Hero -->
                     <div class="form-group">
                         <label>Imagem do Topo (Hero)</label>
-                        <input type="text" id="hero-img-path" placeholder="Ex: assets/images/hero/foto.jpg ou https://link-da-imagem.jpg" required>
-                        <small>Use caminho local (assets/images/...) ou URL externa (Drive, Imgur, etc)</small>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="text" id="hero-img-path" placeholder="Selecione na galeria..." readonly
+                                required style="flex: 1; margin-bottom: 0;">
+                            <button type="button" class="btn-secondary" onclick="openPhotoModal('hero')"
+                                style="padding: 12px 20px; white-space: nowrap;">📷 Selecionar</button>
+                        </div>
+                        <small>Apenas fotos da pasta local (selecione na galeria)</small>
                     </div>
 
                     <!-- Imagem Bio -->
                     <div class="form-group">
                         <label>Imagem da Apresentação (Bio)</label>
-                        <input type="text" id="bio-img-path" placeholder="Ex: assets/images/about/foto.jpg ou https://link-da-imagem.jpg" required>
-                        <small>Use caminho local ou URL externa</small>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="text" id="bio-img-path" placeholder="Selecione na galeria..." readonly required
+                                style="flex: 1; margin-bottom: 0;">
+                            <button type="button" class="btn-secondary" onclick="openPhotoModal('bio')"
+                                style="padding: 12px 20px; white-space: nowrap;">📷 Selecionar</button>
+                        </div>
+                        <small>Apenas fotos da pasta local (selecione na galeria)</small>
+                    </div>
+
+                    <!-- Imagem Contato (Rodapé) -->
+                    <div class="form-group">
+                        <label>Foto do Rodapé (Contato)</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="text" id="contact-img-path" placeholder="Selecione na galeria..." readonly
+                                style="flex: 1; margin-bottom: 0;">
+                            <button type="button" class="btn-secondary" onclick="openPhotoModal('contact')"
+                                style="padding: 12px 20px; white-space: nowrap;">📷 Selecionar</button>
+                        </div>
+                        <small>Foto que aparece na seção de contato do site</small>
                     </div>
 
                     <!-- Texto Hero -->
@@ -64,25 +87,34 @@
                         <small>Texto grande que aparece atrás do conteúdo no topo</small>
                     </div>
 
-                    <!-- Galeria de Fotos do Artista -->
-                    <div class="form-group">
-                        <label>Ou Escolha uma Foto do Artista</label>
-                        <small style="display: block; margin-bottom: 1rem;">Clique em uma foto para usá-la como imagem do topo</small>
-                        <div id="photos-gallery" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 1rem; padding: 1rem; background: #0a0a0a; border-radius: 8px; max-height: 400px; overflow-y: auto;">
-                            <!-- Fotos serão carregadas aqui -->
-                        </div>
-                    </div>
-
                     <button type="submit" class="btn-primary">💾 Salvar Fotos</button>
                 </form>
             </section>
+
+            <!-- Modal de Fotos (Oculto por padrão) -->
+            <div id="photo-modal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Selecionar Foto</h2>
+                        <button class="close-modal" onclick="closePhotoModal()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="modal-hint">Escolha uma foto para o campo <span id="modal-target-label"
+                                style="color: var(--color-primary); font-weight: bold;">...</span></p>
+                        <div id="photos-gallery" class="modal-gallery">
+                            <p>Carregando galeria...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- Seção: Vídeos -->
             <section id="videos" class="section-card" style="display: none;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                     <div>
                         <h2>Vídeos do Site</h2>
-                        <p style="color: #999; font-size: 0.9rem; margin-top: 0.3rem;">Gerenciar vídeos que aparecem no site principal</p>
+                        <p style="color: #999; font-size: 0.9rem; margin-top: 0.3rem;">Gerenciar vídeos que aparecem no
+                            site principal</p>
                     </div>
                     <button id="add-video-btn" class="btn-primary">+ Novo Vídeo</button>
                 </div>
@@ -117,18 +149,21 @@
 
                 <div class="form-group">
                     <label>Descrição</label>
-                    <textarea id="v-desc" placeholder="Descrição curta do vídeo" required style="width: 100%; padding: 0.8rem; background: #000; border: 1px solid #333; color: #fff; border-radius: 4px; font-family: inherit; resize: vertical;"></textarea>
+                    <textarea id="v-desc" placeholder="Descrição curta do vídeo" required
+                        style="width: 100%; padding: 0.8rem; background: #000; border: 1px solid #333; color: #fff; border-radius: 4px; font-family: inherit; resize: vertical;"></textarea>
                 </div>
 
                 <div class="form-group">
                     <label>Imagem/Thumbnail</label>
-                    <input type="text" id="v-thumb" placeholder="Ex: assets/images/videos/thumb.jpg ou https://link-imagem.jpg" required>
+                    <input type="text" id="v-thumb"
+                        placeholder="Ex: assets/images/videos/thumb.jpg ou https://link-imagem.jpg" required>
                     <small>Imagem que aparece antes de clicarem no vídeo</small>
                 </div>
 
                 <div class="form-group">
                     <label>Link do Vídeo</label>
-                    <input type="url" id="v-link" placeholder="Ex: https://www.youtube.com/embed/xxx ou https://drive.google.com/..." required>
+                    <input type="url" id="v-link"
+                        placeholder="Ex: https://www.youtube.com/embed/xxx ou https://drive.google.com/..." required>
                     <small>Links do YouTube, Vimeo, Google Drive, etc</small>
                 </div>
 
@@ -143,6 +178,52 @@
     <!-- Configuração centralizada de URLs (DEVE VIR PRIMEIRO) -->
     <script src="../config.js"></script>
     <!-- Scripts do admin -->
+    <style>
+        /* Toast Notification Styles */
+        #toast-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            border-left: 4px solid var(--primary-color);
+            padding: 16px 24px;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: inherit;
+            font-weight: 600;
+            transform: translateX(120%);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+            opacity: 0;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .toast.error {
+            border-left-color: #ff3333;
+        }
+
+        .toast-icon {
+            font-size: 1.2rem;
+        }
+    </style>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
     <script src="script.js"></script>
 </body>
 

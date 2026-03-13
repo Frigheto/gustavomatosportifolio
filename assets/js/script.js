@@ -51,6 +51,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const bioImg = bioSection.querySelector('.presentation-image img');
       if (data.presentation.image) bioImg.src = data.presentation.image;
 
+      // Update Contact Image
+      const contactImg = document.getElementById('contact-img');
+      if (data.contact && data.contact.image && contactImg) {
+        contactImg.src = data.contact.image;
+        contactImg.style.display = 'block';
+      }
+
       // Update Videos - procura a div video-grid dentro da seção #videos
       let videoGrid = document.querySelector('#videos .video-grid');
 

@@ -40,20 +40,24 @@ document.addEventListener('DOMContentLoaded', () => {
       const resp = await fetch(API_URL);
       const data = await resp.json();
 
-      // Update Hero - corrigido para usar ID correto
-      const heroSection = document.getElementById('home');
-      const heroImgContainer = heroSection.querySelector('.hero-image-container img');
-      if (data.hero.image && heroImgContainer) heroImgContainer.src = data.hero.image;
-      if (data.hero.bgText && bgText) bgText.innerText = data.hero.bgText;
+      // Update Hero image
+      const heroImg = document.getElementById('hero-main-img');
+      if (data.hero?.image && heroImg) heroImg.src = data.hero.image;
+      if (data.hero?.bgText && bgText) bgText.innerText = data.hero.bgText;
 
       // Update Bio
       const bioSection = document.getElementById('apresentacao');
       const bioImg = bioSection.querySelector('.presentation-image img');
-      if (data.presentation.image) bioImg.src = data.presentation.image;
+      if (data.presentation?.image && bioImg) bioImg.src = data.presentation.image;
 
-      // Update Videos - procura a div video-grid dentro da seção #videos
+      // Update Contact background
+      const contactSection = document.getElementById('contato');
+      if (data.contact?.image && contactSection) {
+        contactSection.style.backgroundImage = `url('${data.contact.image}')`;
+      }
+
+      // Update Videos
       let videoGrid = document.querySelector('#videos .video-grid');
-
       if (videoGrid && data.videos) {
         videoGrid.innerHTML = '';
         data.videos.forEach(v => {
@@ -71,7 +75,6 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
           `;
 
-          // Adicionar click handler para vídeos
           if (v.link && v.link !== '#') {
             article.style.cursor = 'pointer';
             article.addEventListener('click', () => {

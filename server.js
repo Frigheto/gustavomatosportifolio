@@ -22,8 +22,8 @@ const isDevelopment = process.env.NODE_ENV !== 'production';
 
 // Definir origens permitidas
 const allowedOrigins = isDevelopment
-  ? ['http://localhost:5173', 'http://localhost:3001', 'http://127.0.0.1:5173']
-  : ['https://portifoliogmatos.vercel.app']; // Produção no Vercel
+    ? ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175', 'http://localhost:3001', 'http://127.0.0.1:5173', 'http://127.0.0.1:5174']
+    : ['https://portifoliogmatos.vercel.app']; // Produção no Vercel
 
 app.use(cors({
     origin: (origin, callback) => {
@@ -97,6 +97,20 @@ app.post('/api/content', requireAuth, (req, res) => {
     fs.writeFile(CONTENT_PATH, JSON.stringify(newContent, null, 2), 'utf8', (err) => {
         if (err) return res.status(500).send('Error saving data');
         res.send('Content updated successfully');
+    });
+});
+
+// List images (PÚBLICO - para o admin poder listar as fotos locais)
+app.get('/api/images', (req, res) => {
+    const imagesDir = path.join(__dirname, 'public/assets/images/fotos-artista');
+    fs.readdir(imagesDir, (err, files) => {
+        if (err) {
+            console.error('Error reading images directory:', err);
+            return res.status(500).json({ error: 'Error reading images' });
+        }
+        // Filtrar apenas imagens
+        const images = files.filter(file => /\.(jpe?g|png|gif|webp)$/i.test(file));
+        res.json(images);
     });
 });
 
