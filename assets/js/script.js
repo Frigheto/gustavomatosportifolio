@@ -11,13 +11,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ============ MOBILE MENU TOGGLE ============
   const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
-  const navLinks = document.querySelector('.nav-links');
+  const navMenu = document.querySelector('.nav-links');
 
   if (mobileMenuToggle) {
     mobileMenuToggle.addEventListener('click', () => {
       mobileMenuToggle.classList.toggle('active');
-      navLinks.classList.toggle('active');
-      document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : 'auto';
+      navMenu.classList.toggle('active');
+      document.body.style.overflow = navMenu.classList.contains('active') ? 'hidden' : 'auto';
     });
 
     // Fechar menu ao clicar em um link
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     navItems.forEach(item => {
       item.addEventListener('click', () => {
         mobileMenuToggle.classList.remove('active');
-        navLinks.classList.remove('active');
+        navMenu.classList.remove('active');
         document.body.style.overflow = 'auto';
       });
     });
@@ -193,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ============ NAV ACTIVE LINK TRACKING ============
   const sections = document.querySelectorAll('section');
-  const navLinks = document.querySelectorAll('.nav-links a');
+  const navLinkItems = document.querySelectorAll('.nav-links a');
 
   window.addEventListener('scroll', () => {
     let current = '';
@@ -205,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    navLinks.forEach(link => {
+    navLinkItems.forEach(link => {
       link.classList.remove('active');
       if (link.getAttribute('href').includes(current)) {
         link.classList.add('active');
