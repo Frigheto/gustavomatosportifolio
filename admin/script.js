@@ -320,10 +320,12 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         if (index !== '') {
-            siteContent.videos[index] = videoData;
+            siteContent.videos[parseInt(index)] = videoData;
         } else {
             siteContent.videos.push(videoData);
         }
+
+        console.log('[Admin] Salvando vídeos:', JSON.stringify(siteContent.videos));
 
         try {
             const resp = await fetch(API_URL, {
@@ -333,6 +335,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify(siteContent)
             });
             const result = await resp.json();
+            console.log('[Admin] Resposta do servidor:', result);
             if (resp.ok && result.success) {
                 videoModal.style.display = 'none';
                 await loadContent();

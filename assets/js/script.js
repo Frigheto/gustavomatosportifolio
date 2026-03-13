@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function loadDynamicContent() {
     try {
-      const resp = await fetch(API_URL);
+      const resp = await fetch(API_URL, { cache: 'no-store' });
       const data = await resp.json();
 
       // Update Hero - corrigido para usar ID correto
