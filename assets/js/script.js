@@ -65,18 +65,20 @@ document.addEventListener('DOMContentLoaded', () => {
       // Update Hero - corrigido para usar ID correto
       const heroSection = document.getElementById('home');
       const heroImgContainer = heroSection.querySelector('.hero-image-container img');
-      if (data.hero.image && heroImgContainer) heroImgContainer.src = data.hero.image;
+      const fixPath = (p) => p && !p.startsWith('http') ? '/' + p : p;
+
+      if (data.hero.image && heroImgContainer) heroImgContainer.src = fixPath(data.hero.image);
       if (data.hero.bgText && bgText) bgText.innerText = data.hero.bgText;
 
       // Update Bio
       const bioSection = document.getElementById('apresentacao');
       const bioImg = bioSection.querySelector('.presentation-image img');
-      if (data.presentation.image) bioImg.src = data.presentation.image;
+      if (data.presentation.image) bioImg.src = fixPath(data.presentation.image);
 
       // Update Contact Image
       const contactImg = document.getElementById('contact-img');
       if (data.contact && data.contact.image && contactImg) {
-        contactImg.src = data.contact.image;
+        contactImg.src = fixPath(data.contact.image);
         contactImg.style.display = 'block';
       }
 
@@ -88,9 +90,10 @@ document.addEventListener('DOMContentLoaded', () => {
         data.videos.forEach(v => {
           const article = document.createElement('article');
           article.className = 'video-card';
+          const thumbSrc = v.image && !v.image.startsWith('http') ? '/' + v.image : (v.image || '');
           article.innerHTML = `
             <div class="video-thumbnail">
-              <img src="${v.image}" alt="${v.title}" onerror="this.src='https://via.placeholder.com/300x200?text=Sem+Imagem'">
+              <img src="${thumbSrc}" alt="${v.title}" onerror="this.style.display='none'">
               <div class="play-icon"></div>
             </div>
             <div class="video-content">
