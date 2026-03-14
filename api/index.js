@@ -77,15 +77,20 @@ initRedisIfNeeded();
 
 // Get current content
 app.get('/api/content', async (req, res) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+
     try {
         if (redis) {
             console.log('📖 GET /api/content - lendo do REDIS (Upstash)');
             const data = await redis.get('site_content');
             if (data) {
+                console.log('✅ Dados lidos do Redis com sucesso');
                 return res.json(typeof data === 'string' ? JSON.parse(data) : data);
             }
+            console.warn('⚠️ Redis conectado mas sem dados - usando fallback');
         }
-        
+
         // Fallback para arquivo local (se não tiver redis)
         console.log('📖 GET /api/content - lendo do ARQUIVO LOCAL fallback');
         fs.readFile(LOCAL_CONTENT_PATH, 'utf8', (err, data) => {
