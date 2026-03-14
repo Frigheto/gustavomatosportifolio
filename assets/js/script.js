@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Update Hero - corrigido para usar ID correto
       const heroSection = document.getElementById('home');
       const heroImgContainer = heroSection.querySelector('.hero-image-container img');
-      const fixPath = (p) => p && !p.startsWith('http') ? '/' + p : p;
+      const fixPath = (p) => p && !p.startsWith('http') && !p.startsWith('/') ? '/' + p : p;
 
       if (data.hero.image && heroImgContainer) heroImgContainer.src = fixPath(data.hero.image);
       if (data.hero.bgText && bgText) bgText.innerText = data.hero.bgText;
