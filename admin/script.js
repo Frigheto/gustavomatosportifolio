@@ -144,9 +144,10 @@ document.addEventListener('DOMContentLoaded', () => {
         siteContent.videos.forEach((video, index) => {
             const card = document.createElement('div');
             card.className = 'video-card';
+            const thumbSrc = video.image && !video.image.startsWith('http') ? '/' + video.image.replace(/^\//, '') : (video.image || '');
             card.innerHTML = `
                 <div class="video-card-image">
-                    <img src="${video.image}" alt="${video.title}" onerror="this.style.background='#333';this.style.minHeight='120px';this.removeAttribute('src')">
+                    <img src="${thumbSrc}" alt="${video.title}" onerror="this.style.background='#333';this.style.minHeight='120px';this.removeAttribute('src')">
                 </div>
                 <div class="video-card-content">
                     <h3>${video.title}</h3>
@@ -361,8 +362,8 @@ document.addEventListener('DOMContentLoaded', () => {
             gallery.innerHTML = '';
             fotos.forEach((foto) => {
                 const img = document.createElement('img');
-                const caminho = `assets/images/fotos-artista/${foto}`;
-                img.src = `../${caminho}`;
+                const caminho = `/assets/images/fotos-artista/${foto}`;
+                img.src = caminho;
                 img.alt = foto;
                 img.loading = 'lazy';
 
